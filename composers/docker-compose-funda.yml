@@ -1,0 +1,33 @@
+version: "3.0"
+
+services:
+  rstudio_funda:
+    # Define container name before building it.
+    container_name: rstudio-funda
+    # To build the image locally, comment out "image" below, and uncomment
+    # "build" and the lines indented under it.
+    # Use local images created using a dockerfile.
+    image: rstudio_server
+    # uncomment "build" section to create images from a docker file
+    # build:
+    #   context: .
+    #   dockerfile: ../dockerfiles/Dockerfile_rstudio
+    # set restart policit for the container
+    restart: unless-stopped
+    # Setting this to something other than 'root' will cause shiny apps not to
+    # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
+    # below.
+    user: 'root'
+    # Uncomment the lines below to disable application logs STDOUT output
+    # environment:
+    #   - APPLICATION_LOGS_TO_STDOUT=false
+    # Select an empty port for the container.
+    ports:
+      - '8005:8787'
+    volumes:
+      # Set external volumes.
+      # User-specific container (external volume). Files in this folder will be stored as an external volume
+      # out of docker container. If docker container was removed, external files will be remained in the main 
+      # computer. Multiple volumes can be defined.
+      - '/home/bio/Containers/funda:/home/rstudio/externalvolume/Container'
+      - '/home/SharedFolder:/home/rstudio/externalvolume/SharedFolder'

@@ -1,0 +1,48 @@
+FROM rocker/r-ver:4.0.4
+
+ENV S6_VERSION=v2.1.0.2
+ENV RSTUDIO_VERSION=latest
+ENV PATH=/usr/lib/rstudio-server/bin:$PATH
+
+# Install RSTUDIO server
+RUN /rocker_scripts/install_rstudio.sh
+RUN /rocker_scripts/install_pandoc.sh
+
+# Define working directory within container.
+WORKDIR /home/rstudio
+
+# Ubuntu packages to be installed
+RUN apt-get update && apt-get install -y libz-dev \
+  librsvg2-dev \
+  default-jdk \
+  libcurl4-openssl-dev \
+  libssl-dev \
+  libxml2-dev \
+  libssh2-1-dev \
+  libgdal-dev \
+  libproj-dev \
+  libgeos-dev \
+  libglu1-mesa-dev \
+  libgmp3-dev \
+  libmpfr-dev \
+  libgl-dev \
+  libglpk-dev
+
+
+# Install R packages for shiny-developement
+RUN R -e "install.packages('devtools')" && \
+    R -e "install.packages('BiocManager')"
+    
+# Reconfigure Java for R
+RUN R CMD javareconf -e
+    
+# Set "rstudio" password so that we can login
+RUN echo "rstudio:rstudio**" | chpasswd
+
+# Add "rstudio" user to sudoers
+RUN adduser rstudio sudo
+
+# RStudio server runs on port 8787 by default.
+EXPOSE 8787
+
+CMD ["/init"]
