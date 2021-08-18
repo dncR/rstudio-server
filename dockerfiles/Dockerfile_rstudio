@@ -3,7 +3,6 @@ FROM rocker/rstudio:4.1.0
 
 # Working directory within container.
 WORKDIR /home/rstudio/
-COPY scripts/ /home/rstudio/docker_scripts
 
 # Add opencpu user to sudoers
 RUN adduser rstudio sudo
@@ -37,9 +36,6 @@ RUN apt-get update && apt-get install -y qpdf \
 # Install R packages for package developement
 RUN R -e "install.packages('devtools')" && \
     R -e "install.packages('BiocManager')"
-
-# Install R packages from a script file
-# RUN Rscript ./TURCOSA/ver1/InstalleR-mlseq.R
 
 # Install Java and Reconfigure Java for R
 RUN apt-get update && apt-get install -y default-jdk
