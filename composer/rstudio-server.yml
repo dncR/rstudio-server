@@ -1,19 +1,19 @@
-version: "3.0"
+version: "3.9"
 
 services:
-  rstudio_dncr:
+  rstudio-server:
     # Define container name before building it.
     container_name: rstudio-dncr
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
-    image: rstudio_server
+    image: dncr/rstudio-server:4.1.1
     # uncomment "build" section to create images from a docker file
     # build:
-    #   context: .
-    #   dockerfile: ../dockerfiles/Dockerfile_rstudio
+    #   context: ../
+    #   dockerfile: dockerfiles/rstudio-server.Dockerfile
     # set restart policit for the container
-    restart: unless-stopped
+    restart: "unless-stopped"
     # Setting this to something other than 'root' will cause shiny apps not to
     # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
     # below.
@@ -24,10 +24,10 @@ services:
     # Select an empty port for the container.
     ports:
       - '8000:8787'
-    volumes:
+    # volumes:
       # Set external volumes.
       # User-specific container (external volume). Files in this folder will be stored as an external volume
       # out of docker container. If docker container was removed, external files will be remained in the main 
       # computer. Multiple volumes can be defined.
-      - '/home/bio/Containers/dncr:/home/rstudio/externalvolume/Container'
-      - '/home/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      # - '/home/bio/Containers/dncr:/home/rstudio/externalvolume/Container'
+      # - '/home/SharedFolder:/home/rstudio/externalvolume/SharedFolder'

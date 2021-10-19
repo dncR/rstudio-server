@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  rstudio-server:
+    image: dncr/rstudio-server:4.1.1
+    build:
+      context: ../
+      dockerfile: dockerfiles/rstudio-server.Dockerfile
+
+  # mlseq-devel:
+  #   image: dncr/rstudio-server:mlseq-devel-4.1.1
+  #   build:
+  #     context: ../
+  #     dockerfile: dockerfiles/rstudio-mlseq.Dockerfile
