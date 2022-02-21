@@ -1,5 +1,5 @@
 # RStudio Server installation from rocker/rstudio.
-FROM rocker/rstudio:4.1.1
+FROM rocker/rstudio:4.1.2
 
 # Working directory within container.
 WORKDIR /home/rstudio/
@@ -32,6 +32,13 @@ RUN apt-get update && apt-get install -y libz-dev \
 # Ubuntu packages required for "R CMD check"
 RUN apt-get update && apt-get install -y qpdf \
   ghostscript-x
+
+# Base TeX installation
+RUN apt update && apt install -y texlive \
+  texlive-fonts-recommended \
+  texlive-fonts-extra
+
+RUN updmap-user
 
 # Install R packages for package developement
 RUN R -e "install.packages('devtools')" && \
