@@ -3,11 +3,11 @@ version: "3.9"
 services:
   rstudio-server:
     # Define container name before building it.
-    container_name: rstudio-4.1.2
+    container_name: rstudio-4.1.1
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
-    image: dncr/rstudio-server:4.1.2-1
+    image: dncr/rstudio-server:4.1.1-texlive
     # uncomment "build" section to create images from a docker file
     build:
       context: ../

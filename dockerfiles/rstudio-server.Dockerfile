@@ -1,5 +1,5 @@
 # RStudio Server installation from rocker/rstudio.
-FROM rocker/rstudio:4.1.2
+FROM rocker/rstudio:4.1.1
 
 # Working directory within container.
 WORKDIR /home/rstudio/
@@ -14,6 +14,7 @@ RUN chown rstudio /usr/local/lib/R/site-library
 RUN chmod -R +rwx /usr/local/lib/R/site-library
 
 # Install ubuntu packages
+# RUN apt-get update && apt-get install -y apt-utils
 RUN apt-get update && apt-get install -y libz-dev \
   nano \
   librsvg2-dev \
@@ -47,6 +48,9 @@ RUN R CMD javareconf -e
 
 # Set "rstudio" password so that we can login
 RUN echo "rstudio:rstudio**" | chpasswd
+
+# Remove scripts folder
+RUN rm -fr /home/rstudio/docker_scripts
 
 # RStudio server runs on port 8787 by default.
 EXPOSE 8787
