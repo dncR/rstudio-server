@@ -3,6 +3,7 @@ FROM rocker/rstudio:4.1.2
 
 # Working directory within container.
 WORKDIR /home/rstudio/
+COPY scripts /home/rstudio/docker_scripts
 
 # Add opencpu user to sudoers
 RUN adduser rstudio sudo
@@ -34,11 +35,7 @@ RUN apt-get update && apt-get install -y qpdf \
   ghostscript-x
 
 # Base TeX installation
-RUN apt update && apt install -y texlive \
-  texlive-fonts-recommended \
-  texlive-fonts-extra
-
-RUN updmap-user
+RUN sh ./docker_scripts/install_texlive_base.sh
 
 # Install R packages for package developement
 RUN R -e "install.packages('devtools')" && \

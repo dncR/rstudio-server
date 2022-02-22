@@ -39,7 +39,7 @@ RUN R -e "install.packages('devtools')" && \
     R -e "install.packages('BiocManager')"
 
 # Install R packages from a script file
-# RUN Rscript ./TURCOSA/ver1/InstalleR-mlseq.R
+# RUN Rscript ./docker_scripts/InstalleR-mlseq.R
 
 # Install Java and Reconfigure Java for R
 RUN apt-get update && apt-get install -y default-jdk
