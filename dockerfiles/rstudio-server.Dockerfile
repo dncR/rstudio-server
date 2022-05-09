@@ -1,9 +1,11 @@
 # RStudio Server installation from rocker/rstudio.
-FROM rocker/rstudio:4.1.1
+FROM rocker/rstudio:4.2.0
 
 # Working directory within container.
 WORKDIR /home/rstudio/
-COPY scripts /home/rstudio/docker_scripts
+COPY ./scripts /home/rstudio/docker_scripts
+
+RUN chmod -R +rwx /home/rstudio/docker_scripts/
 
 # Add opencpu user to sudoers
 RUN adduser rstudio sudo
@@ -36,18 +38,21 @@ RUN apt-get update && apt-get install -y qpdf \
   ghostscript-x
 
 # Base TeX installation
-RUN sh ./docker_scripts/install_texlive_base.sh
+RUN sh ./docker_scripts/texlive_base.sh
 
 # Install R packages for package developement
 RUN R -e "install.packages('devtools')" && \
     R -e "install.packages('BiocManager')"
 
 # Install Java and Reconfigure Java for R
-RUN apt-get update && apt-get install -y default-jdk
+RUN apt-get update && apt-get install -y default-jdk \
+  default-jre
+  
 RUN R CMD javareconf -e
 
 # Set "rstudio" password so that we can login
-RUN echo "rstudio:rstudio**" | chpasswd
+# Comment the next line if the password is set through Docker Compose file using "environment" variable
+# RUN echo "rstudio:rstudio**" | chpasswd
 
 # Remove scripts folder
 RUN rm -fr /home/rstudio/docker_scripts
