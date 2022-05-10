@@ -3,15 +3,15 @@ version: "3.9"
 services:
   rstudio-server:
     # Define container name before building it.
-    container_name: rstudio-4.2.0
+    container_name: rstudio-yzkurs
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
-    image: dncr/rstudio-server:4.2.0-texlive
+    image: rstudio-server-yzkurs:4.2.0
     # uncomment "build" section to create images from a docker file
     build:
       context: ../
-      dockerfile: dockerfiles/rstudio-server.Dockerfile
+      dockerfile: dockerfiles/rstudio-server-yzkurs.Dockerfile
     # set restart policit for the container
     restart: "unless-stopped"
     # Setting this to something other than 'root' will cause shiny apps not to

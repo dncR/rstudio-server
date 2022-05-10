@@ -4,7 +4,6 @@ FROM rocker/rstudio:4.2.0
 # Working directory within container.
 WORKDIR /home/rstudio/
 COPY ./scripts /home/rstudio/docker_scripts
-
 RUN chmod -R +rwx /home/rstudio/docker_scripts/
 
 # Add opencpu user to sudoers
