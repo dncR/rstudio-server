@@ -6,9 +6,16 @@ services:
     build:
       context: ../
       dockerfile: dockerfiles/rstudio-server.Dockerfile
+      
 
   # mlseq-devel:
   #   image: dncr/rstudio-server:mlseq-devel-4.1.1
   #   build:
   #     context: ../
   #     dockerfile: dockerfiles/rstudio-mlseq.Dockerfile
+
+  rstudio-server-yzkurs:
+    image: rstudio-server-yzkurs:4.2.0
+    build:
+      context: ../
+      dockerfile: dockerfiles/rstudio-server-yzkurs.Dockerfile

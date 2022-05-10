@@ -1,17 +1,11 @@
 version: "3.9"
 
 services:
-  rstudio-server:
+  rstudio-server-dncr:
     # Define container name before building it.
-    container_name: rstudio-yzkurs
-    # To build the image locally, comment out "image" below, and uncomment
-    # "build" and the lines indented under it.
+    container_name: rstudio-yzkurs-dncr
     # Use local images created using a dockerfile.
     image: rstudio-server-yzkurs:4.2.0
-    # uncomment "build" section to create images from a docker file
-    build:
-      context: ../
-      dockerfile: dockerfiles/rstudio-server-yzkurs.Dockerfile
     # set restart policit for the container
     restart: "unless-stopped"
     # Setting this to something other than 'root' will cause shiny apps not to
@@ -32,5 +26,89 @@ services:
       # out of docker container. If docker container was removed, external files will be remained in the main 
       # computer. Multiple volumes can be defined.
       # - '/home/bio/Containers/dncr:/home/rstudio/externalvolume/Container'
-      # - '/home/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
-      - ../externalvolume:/home/rstudio/externalvolume
+      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      # - ../externalvolume:/home/rstudio/externalvolume
+
+  rstudio-server-merve:
+    container_name: rstudio-yzkurs-merve
+    image: rstudio-server-yzkurs:4.2.0
+    restart: "unless-stopped"
+    user: 'root'
+    environment:
+      # - USER=rstudio  # by default, the username is set "rstudio"
+      - PASSWORD=rstudio**
+      - ROOT=TRUE
+    ports:
+      - '8001:8787'
+    volumes:
+      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+
+  rstudio-server-gokmen:
+    container_name: rstudio-yzkurs-gokmen
+    image: rstudio-server-yzkurs:4.2.0
+    restart: "unless-stopped"
+    user: 'root'
+    environment:
+      # - USER=rstudio  # by default, the username is set "rstudio"
+      - PASSWORD=rstudio**
+      - ROOT=TRUE
+    ports:
+      - '8002:8787'
+    volumes:
+      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+
+  rstudio-server-gozde:
+    container_name: rstudio-yzkurs-gozde
+    image: rstudio-server-yzkurs:4.2.0
+    restart: "unless-stopped"
+    user: 'root'
+    environment:
+      # - USER=rstudio  # by default, the username is set "rstudio"
+      - PASSWORD=rstudio**
+      - ROOT=TRUE
+    ports:
+      - '8003:8787'
+    volumes:
+      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+
+  rstudio-server-ahu:
+    container_name: rstudio-yzkurs-ahu
+    image: rstudio-server-yzkurs:4.2.0
+    restart: "unless-stopped"
+    user: 'root'
+    environment:
+      # - USER=rstudio  # by default, the username is set "rstudio"
+      - PASSWORD=rstudio**
+      - ROOT=TRUE
+    ports:
+      - '8004:8787'
+    volumes:
+      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+
+  rstudio-server-funda:
+    container_name: rstudio-yzkurs-funda
+    image: rstudio-server-yzkurs:4.2.0
+    restart: "unless-stopped"
+    user: 'root'
+    environment:
+      # - USER=rstudio  # by default, the username is set "rstudio"
+      - PASSWORD=rstudio**
+      - ROOT=TRUE
+    ports:
+      - '8005:8787'
+    volumes:
+      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+
+  rstudio-server-ilayda:
+    container_name: rstudio-yzkurs-ilayda
+    image: rstudio-server-yzkurs:4.2.0
+    restart: "unless-stopped"
+    user: 'root'
+    environment:
+      # - USER=rstudio  # by default, the username is set "rstudio"
+      - PASSWORD=rstudio**
+      - ROOT=TRUE
+    ports:
+      - '8006:8787'
+    volumes:
+      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
