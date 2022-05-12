@@ -1,3 +1,6 @@
+# install.packages("devtools")
+# install.packages("BiocManager")
+
 # Common Packages
 pkgs <- c("markdown", "rmarkdown", "dplyr", "magrittr", "caret", "ggplot2")
 install.packages(pkgs)

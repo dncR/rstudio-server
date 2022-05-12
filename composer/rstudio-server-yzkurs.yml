@@ -6,6 +6,7 @@ services:
     container_name: rstudio-yzkurs-dncr
     # Use local images created using a dockerfile.
     image: rstudio-server-yzkurs:4.2.0
+    # image: dncr/rstudio-server:4.2.0-texlive
     # set restart policit for the container
     restart: "unless-stopped"
     # Setting this to something other than 'root' will cause shiny apps not to
@@ -26,8 +27,8 @@ services:
       # out of docker container. If docker container was removed, external files will be remained in the main 
       # computer. Multiple volumes can be defined.
       # - '/home/bio/Containers/dncr:/home/rstudio/externalvolume/Container'
-      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
-      # - ../externalvolume:/home/rstudio/externalvolume
+      # - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      - ../externalvolume:/home/rstudio/externalvolume
 
   rstudio-server-merve:
     container_name: rstudio-yzkurs-merve
@@ -41,7 +42,8 @@ services:
     ports:
       - '8001:8787'
     volumes:
-      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      - ../externalvolume:/home/rstudio/externalvolume
+      # - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
 
   rstudio-server-gokmen:
     container_name: rstudio-yzkurs-gokmen
@@ -55,7 +57,8 @@ services:
     ports:
       - '8002:8787'
     volumes:
-      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      - ../externalvolume:/home/rstudio/externalvolume
+      # - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
 
   rstudio-server-gozde:
     container_name: rstudio-yzkurs-gozde
@@ -69,7 +72,8 @@ services:
     ports:
       - '8003:8787'
     volumes:
-      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      - ../externalvolume:/home/rstudio/externalvolume
+      # - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
 
   rstudio-server-ahu:
     container_name: rstudio-yzkurs-ahu
@@ -83,7 +87,8 @@ services:
     ports:
       - '8004:8787'
     volumes:
-      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      - ../externalvolume:/home/rstudio/externalvolume
+      # - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
 
   rstudio-server-funda:
     container_name: rstudio-yzkurs-funda
@@ -97,7 +102,8 @@ services:
     ports:
       - '8005:8787'
     volumes:
-      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      - ../externalvolume:/home/rstudio/externalvolume
+      # - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
 
   rstudio-server-ilayda:
     container_name: rstudio-yzkurs-ilayda
@@ -111,4 +117,5 @@ services:
     ports:
       - '8006:8787'
     volumes:
-      - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
+      - ../externalvolume:/home/rstudio/externalvolume
+      # - '/home/yzkurs/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
