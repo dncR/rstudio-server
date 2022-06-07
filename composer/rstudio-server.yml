@@ -9,9 +9,9 @@ services:
     # Use local images created using a dockerfile.
     image: dncr/rstudio-server:4.2.0-texlive
     # uncomment "build" section to create images from a docker file
-    build:
-      context: ../
-      dockerfile: dockerfiles/rstudio-server.Dockerfile
+    # build:
+    #  context: ../
+    #  dockerfile: dockerfiles/rstudio-server.Dockerfile
     # set restart policit for the container
     restart: "unless-stopped"
     # Setting this to something other than 'root' will cause shiny apps not to
@@ -33,4 +33,5 @@ services:
       # computer. Multiple volumes can be defined.
       # - '/home/bio/Containers/dncr:/home/rstudio/externalvolume/Container'
       # - '/home/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
-      - ../externalvolume:/home/rstudio/externalvolume
+      # - ../externalvolume:/home/rstudio/externalvolume
+        - /home/dncr:/home/rstudio/extrenalvolume
