@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  rstudio-server:
+    image: dncr/rstudio-server:4.2.1
+    build:
+      context: ../
+      dockerfile: dockerfiles/rstudio-server-4.2.1.Dockerfile
+  
+  rstudio-server-texlive:
+    image: dncr/rstudio-server:4.2.1-texlive
+    build:
+      context: ../
+      dockerfile: dockerfiles/rstudio-server-4.2.1-texlive.Dockerfile
+    depends_on:
+      - rstudio-server
+      
+  rstudio-server-texlive-full:
+    image: dncr/rstudio-server:4.2.1-texlive-full
+    build:
+      context: ../
+      dockerfile: dockerfiles/rstudio-server-4.2.1-texlive-full.Dockerfile
+    depends_on:
+      - rstudio-server
+
+
