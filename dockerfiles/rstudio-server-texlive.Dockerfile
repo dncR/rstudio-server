@@ -1,15 +1,15 @@
 # RStudio Server installation from rocker/rstudio.
-FROM dncr/rstudio-server:4.3.0
+FROM dncr/rstudio-server:4.3.2
 
 # Working directory within container.
 WORKDIR /home/rstudio/
 
-# Copy scripts into container.
+# Copy required files into docker container
 COPY ./scripts /home/rstudio/docker_scripts
 RUN chmod -R +rwx /home/rstudio/docker_scripts/
 
 # Base TeX installation
-RUN sh ./docker_scripts/texlive_full.sh
+RUN sh ./docker_scripts/texlive_base.sh
 
 # Set "rstudio" password so that we can login
 # Comment the next line if the password is set through Docker Compose file using "environment" variable

@@ -1,5 +1,5 @@
 # RStudio Server installation from rocker/rstudio.
-FROM rocker/rstudio:4.2.0
+FROM rocker/rstudio:4.3.2
 
 # Working directory within container.
 WORKDIR /home/rstudio/
