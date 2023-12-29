@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  r-base:
+    image: dncr/r-base:4.3.2-ARM
+    build:
+      context: ../../
+      dockerfile: dockerfiles/4.3.2/r-base-ARM.Dockerfile
+

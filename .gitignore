@@ -38,6 +38,10 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
+# MAC OS System Files
+.DS_Store
+
 # External volumes
 externalvolume/
 IgnoredFiles/
+

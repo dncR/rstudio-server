@@ -4,20 +4,20 @@ services:
   rstudio-server:
     image: dncr/rstudio-server:4.3.2
     build:
-      context: ../
-      dockerfile: dockerfiles/rstudio-server.Dockerfile
+      context: ../../
+      dockerfile: dockerfiles/4.3.2/rstudio-server.Dockerfile
     profiles:
       - build-dep
-  
+
   rstudio-server-texlive:
     image: dncr/rstudio-server:4.3.2-texlive
     build:
-      context: ../
-      dockerfile: dockerfiles/rstudio-server-texlive.Dockerfile
+      context: ../../
+      dockerfile: dockerfiles/4.3.2/rstudio-server-texlive.Dockerfile
       
   rstudio-server-texlive-full:
     image: dncr/rstudio-server:4.3.2-texlive-full
     build:
-      context: ../
-      dockerfile: dockerfiles/rstudio-server-texlive-full.Dockerfile
+      context: ../../
+      dockerfile: dockerfiles/4.3.2/rstudio-server-texlive-full.Dockerfile
 
