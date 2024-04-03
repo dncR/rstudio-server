@@ -1,9 +1,0 @@
-version: "3.9"
-
-services:
-  r-base:
-    image: dncr/r-base:4.3.3
-    build:
-      context: ../../
-      dockerfile: dockerfiles/4.3.3/r-base.Dockerfile
-

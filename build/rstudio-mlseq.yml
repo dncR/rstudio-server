@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:    
   mlseq-devel:
     image: dncr/rstudio-server:mlseq-devel-4.1.1

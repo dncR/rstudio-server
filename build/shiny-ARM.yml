@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   shiny-server:
     image: dncr/shiny-server:4.3.3-ARM

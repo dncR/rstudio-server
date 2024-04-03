@@ -1,6 +1,6 @@
 FROM ubuntu:jammy
 
-ENV R_VERSION=4.3.3
+#ENV R_VERSION=4.3.3
 ENV R_HOME=/usr/local/lib/R
 ENV TZ=Etc/UTC
 

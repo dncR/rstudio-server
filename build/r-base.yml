@@ -1,0 +1,12 @@
+services:
+  r-base:
+    image: dncr/r-base:${R_VERSION}
+    build:
+      context: ../
+      dockerfile: dockerfiles/r-base.Dockerfile
+    #env_file:
+    #  - default.env
+      
+    environment:
+      - R_VERSION=${R_VERSION}
+
