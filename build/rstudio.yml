@@ -1,21 +1,23 @@
 services:
   rstudio-server:
-    image: dncr/rstudio-server:latest
+    image: dncr/rstudio-server:${R_VERSION}
     build:
-      context: ../../
-      dockerfile: dockerfiles/rstudio-server.Dockerfile
+      context: ../
+      dockerfile: dockerfiles/rstudio.Dockerfile
+      args:
+        - RSTUDIO_VERSION=${RSTUDIO_VERSION}
+        - R_VERSION=${R_VERSION}
     profiles:
       - build-dep
 
   rstudio-server-texlive:
     image: dncr/rstudio-server:latest-texlive
     build:
-      context: ../../
+      context: ../
       dockerfile: dockerfiles/rstudio-server-texlive.Dockerfile
       
   rstudio-server-texlive-full:
     image: dncr/rstudio-server:latest-texlive-full
     build:
-      context: ../../
+      context: ../
       dockerfile: dockerfiles/rstudio-server-texlive-full.Dockerfile
-

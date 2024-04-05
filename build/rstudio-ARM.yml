@@ -2,17 +2,17 @@ services:
   rstudio-server:
     image: dncr/rstudio-server:latest-ARM
     build:
-      context: ../../
+      context: ../
       dockerfile: dockerfiles/rstudio-ARM.Dockerfile
 
   rstudio-server-texlive:
     image: dncr/rstudio-server:latest-texlive-ARM
     build:
-      context: ../../
+      context: ../
       dockerfile: dockerfiles/rstudio-texlive-ARM.Dockerfile
       
   rstudio-server-texlive-full:
     image: dncr/rstudio-server:latest-texlive-full-ARM
     build:
-      context: ../../
+      context: ../
       dockerfile: dockerfiles/rstudio-texlive-full-ARM.Dockerfile

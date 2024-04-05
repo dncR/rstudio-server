@@ -1,8 +1,13 @@
-services:
+services:      
   r-base:
-    image: dncr/r-base:4.3.3-ARM
+    image: dncr/r-base:${R_VERSION}-ARM
     build:
-      context: ../../
-      dockerfile: dockerfiles/4.3.3/r-base-ARM.Dockerfile
-    environment:
-      - R_VERSION=4.3.3
+      context: ../
+      dockerfile: dockerfiles/r-base-ARM.Dockerfile
+      args:
+        - R_VERSION=${R_VERSION}
+        - R_HOME=${R_HOME}
+        - TZ=${TZ}
+        - CRAN=${CRAN}
+        - LANG=${LANG}
+

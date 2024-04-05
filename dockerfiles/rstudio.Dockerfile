@@ -1,5 +1,17 @@
 # RStudio Server installation from rocker/rstudio.
-FROM rocker/rstudio:4.3.3
+FROM dncr/r-base:4.3.3
+
+ARG RSTUDIO_VERSION
+ENV RSTUDIO_VERSION=${RSTUDIO_VERSION}
+
+ENV S6_VERSION=v2.1.0.2
+ENV DEFAULT_USER=rstudio
+ENV PANDOC_VERSION=default
+ENV QUARTO_VERSION=default
+
+RUN /rocker_scripts/install_rstudio.sh
+RUN /rocker_scripts/install_pandoc.sh
+RUN /rocker_scripts/install_quarto.sh
 
 # Working directory within container.
 WORKDIR /home/rstudio/
