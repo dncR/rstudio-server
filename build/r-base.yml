@@ -4,9 +4,10 @@ services:
     build:
       context: ../
       dockerfile: dockerfiles/r-base.Dockerfile
-    #env_file:
-    #  - default.env
-      
-    environment:
-      - R_VERSION=${R_VERSION}
+      args:
+        - R_VERSION=${R_VERSION}
+        - R_HOME=${R_HOME}
+        - TZ=${TZ}
+        - CRAN=${CRAN}
+        - LANG=${LANG}
 
