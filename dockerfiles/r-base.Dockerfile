@@ -1,4 +1,7 @@
-FROM ubuntu:jammy
+ARG UBUNTU_VERSION
+ARG DOCKER_HUB_REPO
+
+FROM ${DOCKER_HUB_REPO}:${UBUNTU_VERSION}
 
 # Define BUILD args.
 ARG R_VERSION
@@ -16,6 +19,7 @@ ENV LANG=${LANG}
 
 COPY scripts/install_R_source.sh /rocker_scripts/install_R_source.sh
 RUN /rocker_scripts/install_R_source.sh
+
 COPY scripts /rocker_scripts
 RUN /rocker_scripts/setup_R.sh
 

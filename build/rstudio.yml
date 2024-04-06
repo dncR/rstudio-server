@@ -1,23 +1,51 @@
+# Network configurations for ShinyProxy service. Uncomment below code lines to create
+# a user-defined network (disables auto-configured networks).
+#networks:
+#  rstudio-network-4.2.1:
+#    name: rstudio-network-4.2.1
+
 services:
   rstudio-server:
-    image: dncr/rstudio-server:${R_VERSION}
+    # Define container name before building it.
+    container_name: rstudio-${R_VERSION}-tmp
+    # To build the image locally, comment out "image" below, and uncomment
+    # "build" and the lines indented under it.
+    # Use local images created using a dockerfile.
+    image: dncr/rstudio-server:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}${TEX_SUFFIX}
     build:
       context: ../
-      dockerfile: dockerfiles/rstudio.Dockerfile
+      dockerfile: dockerfiles/rstudio${TEX_SUFFIX}.Dockerfile
       args:
         - RSTUDIO_VERSION=${RSTUDIO_VERSION}
         - R_VERSION=${R_VERSION}
-    profiles:
-      - build-dep
-
-  rstudio-server-texlive:
-    image: dncr/rstudio-server:latest-texlive
-    build:
-      context: ../
-      dockerfile: dockerfiles/rstudio-server-texlive.Dockerfile
-      
-  rstudio-server-texlive-full:
-    image: dncr/rstudio-server:latest-texlive-full
-    build:
-      context: ../
-      dockerfile: dockerfiles/rstudio-server-texlive-full.Dockerfile
+        - ARCH=${ARCH}
+        - UBUNTU_VERSION=${UBUNTU_VERSION}
+    env_file:
+      - .env
+    # set restart policit for the container
+    restart: "unless-stopped"
+    # Setting this to something other than 'root' will cause shiny apps not to
+    # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
+    # below.
+    user: 'root'
+    # Define environments.
+    environment:
+      # - USER=rstudio  # by default, the username is set "rstudio"
+      - PASSWORD=rstudio**
+    # Select an empty port for the container.
+    ports:
+      - '8004:8787'
+    volumes:
+      # Set external volumes.
+      # User-specific container (external volume). Files in this folder will be stored as an external volume
+      # out of docker container. If docker container was removed, external files will be remained in the main 
+      # computer. Multiple volumes can be defined.
+        - /Users/dncr:/home/rstudio/externalvolume
+        - /Volumes:/home/rstudio/externalmedia
+    #deploy:
+    #  resources:
+    #    limits:
+    #      cpus: "1.0"  # Set the fraction of CPU cores (0.5 means half of a core)
+    #      memory: 32G  # Set the memory limit (e.g., 512 megabytes)
+    #networks:
+    #  - rstudio-network-4.2.1

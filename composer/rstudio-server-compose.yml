@@ -6,16 +6,14 @@
 
 services:
   rstudio-server:
+    env_file:
+      - /Users/dncr/Documents/GitHub/rstudio-server/build/.env
     # Define container name before building it.
-    container_name: rstudio-4.3.3
+    container_name: rstudio-${R_VERSION}-tmp
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
-    image: dncr/rstudio-server:4.3.3-texlive
-    # uncomment "build" section to create images from a docker file
-    # build:
-    #  context: ../
-    #  dockerfile: dockerfiles/rstudio-server.Dockerfile
+    image: dncr/rstudio-server:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}
     # set restart policit for the container
     restart: "unless-stopped"
     # Setting this to something other than 'root' will cause shiny apps not to
@@ -29,17 +27,14 @@ services:
       - ROOT=TRUE
     # Select an empty port for the container.
     ports:
-      - '8000:8787'
+      - '8004:8787'
     volumes:
       # Set external volumes.
       # User-specific container (external volume). Files in this folder will be stored as an external volume
       # out of docker container. If docker container was removed, external files will be remained in the main 
       # computer. Multiple volumes can be defined.
-      # - '/home/bio/Containers/dncr:/home/rstudio/externalvolume/Container'
-      # - '/home/SharedFolder:/home/rstudio/externalvolume/SharedFolder'
-      # - ../externalvolume:/home/rstudio/externalvolume
-        - /home/dncr:/home/rstudio/externalvolume
-        - /media/dncr:/home/rstudio/externalmedia
+        - /Users/dncr:/home/rstudio/externalvolume
+        - /Volumes:/home/rstudio/externalmedia
     #deploy:
     #  resources:
     #    limits:

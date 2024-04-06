@@ -1,6 +1,6 @@
 services:
   r-base:
-    image: dncr/r-base:${R_VERSION}
+    image: dncr/r-base:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}
     build:
       context: ../
       dockerfile: dockerfiles/r-base.Dockerfile
@@ -9,5 +9,7 @@ services:
         - R_HOME=${R_HOME}
         - TZ=${TZ}
         - CRAN=${CRAN}
-        - LANG=${LANG}
+        - LANG=${LANG_SET}
+        - UBUNTU_VERSION=${UBUNTU_VERSION}
+        - DOCKER_HUB_REPO=${DOCKER_HUB_REPO}
 
