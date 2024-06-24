@@ -31,7 +31,7 @@ services:
     # Define environments.
     environment:
       # - USER=rstudio  # by default, the username is set "rstudio"
-      - PASSWORD=rstudio**
+      - PASSWORD=rstudio
     # Select an empty port for the container.
     ports:
       - '8004:8787'
