@@ -45,7 +45,10 @@ RUN apt-get update && apt-get install -y libz-dev \
   libgmp3-dev \
   libmpfr-dev \
   libgl-dev \
-  libglpk-dev
+  libglpk-dev \
+  libharfbuzz-dev \
+  libfribidi-dev \
+  libgit2-dev
 
 # Ubuntu packages required for "R CMD check"
 RUN apt-get update && apt-get install -y qpdf \
@@ -57,7 +60,7 @@ RUN R -e "install.packages('devtools')" && \
 
 # Install Java and Reconfigure Java for R
 RUN apt-get update && apt-get install -y default-jdk \
-  default-jre
+    default-jre
   
 RUN R CMD javareconf -e
 
