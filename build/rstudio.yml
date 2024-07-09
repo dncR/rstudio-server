@@ -11,10 +11,10 @@ services:
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
-    image: dncr/rstudio-server:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}${TEX_SUFFIX}
+    image: dncr/rstudio-server:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}-${TEX_SUFFIX}
     build:
       context: ../
-      dockerfile: dockerfiles/rstudio${TEX_SUFFIX}.Dockerfile
+      dockerfile: dockerfiles/rstudio-${TEX_SUFFIX}.Dockerfile
       args:
         - RSTUDIO_VERSION=${RSTUDIO_VERSION}
         - R_VERSION=${R_VERSION}
@@ -31,7 +31,7 @@ services:
     # Define environments.
     environment:
       # - USER=rstudio  # by default, the username is set "rstudio"
-      - PASSWORD=rstudio
+      - PASSWORD=rstudio**
     # Select an empty port for the container.
     ports:
       - '8004:8787'
