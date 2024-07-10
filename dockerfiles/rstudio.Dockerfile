@@ -68,6 +68,9 @@ RUN R CMD javareconf -e
 # Comment the next line if the password is set through Docker Compose file using "environment" variable
 # RUN echo "rstudio:rstudio**" | chpasswd
 
+# Set LANG from locale.
+RUN locale-gen en_US.UTF-8
+
 # RStudio server runs on port 8787 by default.
 EXPOSE 8787
 

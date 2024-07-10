@@ -11,10 +11,10 @@ services:
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
-    image: dncr/rstudio-server:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}${TEX_SUFFIX}
+    image: dncr/rstudio-server:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}
     build:
       context: ../
-      dockerfile: dockerfiles/rstudio${TEX_SUFFIX}.Dockerfile
+      dockerfile: dockerfiles/rstudio.Dockerfile
       args:
         - RSTUDIO_VERSION=${RSTUDIO_VERSION}
         - R_VERSION=${R_VERSION}
@@ -40,8 +40,9 @@ services:
       # User-specific container (external volume). Files in this folder will be stored as an external volume
       # out of docker container. If docker container was removed, external files will be remained in the main 
       # computer. Multiple volumes can be defined.
-        - /Users/dncr:/home/rstudio/externalvolume
-        - /Volumes:/home/rstudio/externalmedia
+      - /home/dncr:/home/rstudio/externalvolume
+      #  - /Users/dncr:/home/rstudio/externalvolume
+      #  - /Volumes:/home/rstudio/externalmedia
     #deploy:
     #  resources:
     #    limits:
