@@ -1,6 +1,8 @@
 services:
   r-base:
     image: dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}
+    env_file:
+      - .env
     build:
       context: ../
       dockerfile: dockerfiles/r-base.Dockerfile
