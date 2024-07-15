@@ -3,7 +3,7 @@ ARG R_VERSION
 ARG ARCH
 ARG UBUNTU_VERSION
 
-FROM dncr/r-base:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}
+FROM dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}
 
 ARG RSTUDIO_VERSION
 
@@ -14,6 +14,8 @@ ENV PANDOC_VERSION=default
 ENV QUARTO_VERSION=default
 
 COPY scripts /rocker_scripts
+RUN chmod 777 -R /rocker_scripts
+
 RUN /rocker_scripts/install_rstudio.sh
 RUN /rocker_scripts/install_pandoc.sh
 RUN /rocker_scripts/install_quarto.sh
