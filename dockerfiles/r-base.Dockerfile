@@ -24,4 +24,3 @@ COPY scripts /rocker_scripts
 RUN /rocker_scripts/setup_R.sh
 
 CMD ["R"]
-#CMD ["bash"]
