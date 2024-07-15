@@ -1,6 +1,30 @@
 # Enabling Docker to Run and Compile Multiplatforms on Linux
 
-To enable Docker to run and compile for multiple platforms on a Linux system without Docker Desktop, follow these steps:
+Before continuing below steps, you should enable **containerd** image store for Docker Engine. Furthermore, if you haven't already, you might need to enable Docker's experimental features to use the `buildx` command. 
+
+Edit or create the **daemon.json** file:
+
+```sh
+sudo nano /etc/docker/daemon.json
+```
+
+**`daemon.json`** file:
+```json
+{
+  "experimental": true,
+  "features": {
+    "containerd-snapshotter": true
+  }
+}
+```
+
+Finally, restart Docker service:
+
+```sh
+sudo systemctl restart docker
+```
+
+Next, to enable Docker to run and compile for multiple platforms on a Linux system without Docker Desktop, follow these steps:
 
 ## Step 1: Install QEMU
 
@@ -19,7 +43,7 @@ sudo apt-get install -y qemu binfmt-support qemu-user-static
 sudo yum install -y qemu binfmt-support qemu-user-static
 ```
 
-## Step 2: Install QEMU
+## Step 2: Download QEMU Static Binaries
 
 You need to download the statically compiled QEMU binaries. The easiest way to get these is from the **tonistiigi/binfmt** Docker image.
 
@@ -45,25 +69,23 @@ ls -la /proc/sys/fs/binfmt_misc/
 
 You should see entries for different architectures such as **qemu-aarch64**, **qemu-arm**, **qemu-ppc64le**, etc.
 
-## Step 5: Enable Experimental Features (Optional)
+## Step 5: Set Up Docker Buildx
 
-If you haven't already, you might need to enable Docker's experimental features to use the `buildx` command. Edit or create the **daemon.json** file:
-
-```sh
-sudo nano /etc/docker/daemon.json
-```
-
-```json
-{
-  "experimental": true,
-  "features": {
-    "containerd-snapshotter": true
-  }
-}
-```
-
-Finally, restart Docker service:
+Docker Buildx is a Docker CLI plugin that extends the Docker command with the full support of the features provided by Moby BuildKit builder toolkit.
 
 ```sh
-sudo systemctl restart docker
+docker buildx create --name multiarch --use
+docker buildx inspect --bootstrap multiarch
+```
+
+## Step 6: Build and Push Docker Image(s)
+
+Build from a **bake.hcl** configuration file.
+
+```sh
+# Load into local image library. 
+# (Use --push to push created image directly to the Docker Hub repository. Login required.)
+
+# docker buildx bake --file <path_to_bake_file> --builder multiarch --load
+docker buildx bake --file r-base.hcl --builder multiarch --load
 ```
