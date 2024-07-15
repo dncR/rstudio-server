@@ -40,7 +40,7 @@ target "r-base" {
     "org.opencontainers.image.authors" = "Dincer Goksuluk <dincergoksuluk@erciyes.edu.tr>"
   }
 
-  platforms = ["linux/amd64"]
+  platforms = ["linux/amd64","linux/arm64/v8"]
 
   tags = ["dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}"]
 
