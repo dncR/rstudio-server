@@ -1,6 +1,8 @@
 services:
   r-base:
-    image: dncr/r-base:${R_VERSION}-${ARCH}-${UBUNTU_VERSION}
+    image: dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}
+    env_file:
+      - .env
     build:
       context: ../
       dockerfile: dockerfiles/r-base.Dockerfile
@@ -12,4 +14,6 @@ services:
         - LANG=${LANG_SET}
         - UBUNTU_VERSION=${UBUNTU_VERSION}
         - DOCKER_HUB_REPO=${DOCKER_HUB_REPO}
+      platforms:
+        - linux/arm64/v8
 
