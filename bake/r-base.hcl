@@ -34,7 +34,7 @@ target "r-base" {
   labels = {
     "org.opencontainers.image.title" = "dncr/r-base"
     "org.opencontainers.image.description" = "Reproducible builds to fixed version of R"
-    "org.opencontainers.image.base.name" = "docker.io/library/ubuntu:jammy"
+    "org.opencontainers.image.base.name" = "docker.io/library/ubuntu:${UBUNTU_VERSION}"
     "org.opencontainers.image.licenses" = "GPL-2.0-or-later"
     "org.opencontainers.image.source" = "https://github.com/dncr/rstudio-server"
     "org.opencontainers.image.authors" = "Dincer Goksuluk <dincergoksuluk@erciyes.edu.tr>"
