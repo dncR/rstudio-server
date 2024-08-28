@@ -4,23 +4,27 @@ group "default" {
 }
 
 variable "R_VERSION" {
-  default = "4.4.1"
+  default = "$R_VERSION"
 }
 
 variable "RSTUDIO_VERSION" {
-  default = "2024.04.2+764"
+  default = "$RSTUDIO_VERSION"
 }
 
 variable "UBUNTU_VERSION" {
-  default = "jammy"
+  default = "$UBUNTU_VERSION"
 }
 
 variable "R_HOME" {
-  default = "/usr/local/lib/R"
+  default = "$R_HOME"
 }
 
 variable "TZ" {
-  default = "Etc/UTC"
+  default = "$TZ"
+}
+
+variable "LANG_SET" {
+  default = "$LANG_SET"
 }
 
 variable "CRAN" {
@@ -28,7 +32,7 @@ variable "CRAN" {
 }
 
 variable "DOCKER_HUB_REPO" {
-  default = "ubuntu"
+  default = "$DOCKER_HUB_REPO"
 }
 
 target "rstudio" {
@@ -54,7 +58,7 @@ target "rstudio" {
     "R_HOME" = "${R_HOME}"
     "TZ" = "${TZ}"
     "CRAN" = "${CRAN}"
-    "LANG" = "en_US.UTF-8"
+    "LANG" = "${LANG_SET}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
   }

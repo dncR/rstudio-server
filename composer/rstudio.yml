@@ -1,3 +1,5 @@
+# name: rstudio-server
+
 # Network configurations for ShinyProxy service. Uncomment below code lines to create
 # a user-defined network (disables auto-configured networks).
 #networks:
@@ -12,26 +14,26 @@ services:
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
     image: dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}
-    build:
-      context: ../
-      dockerfile: dockerfiles/rstudio.Dockerfile
-      args:
-        - RSTUDIO_VERSION=${RSTUDIO_VERSION}
-        - R_VERSION=${R_VERSION}
-        - ARCH=${ARCH}
-        - UBUNTU_VERSION=${UBUNTU_VERSION}
+    #build:
+    #  context: ../
+    #  dockerfile: dockerfiles/rstudio.Dockerfile
+    #  args:
+    #    - RSTUDIO_VERSION=${RSTUDIO_VERSION}
+    #    - R_VERSION=${R_VERSION}
+    #    - ARCH=${ARCH}
+    #    - UBUNTU_VERSION=${UBUNTU_VERSION}
     env_file:
       - .env
+    # Define extra environments not specified in "env_file".
+    environment:
+      # - USER=rstudio  # by default, the username is set "rstudio"
+      - PASSWORD=rstudio**
     # set restart policit for the container
     restart: "unless-stopped"
     # Setting this to something other than 'root' will cause shiny apps not to
     # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
     # below.
     user: 'root'
-    # Define environments.
-    environment:
-      # - USER=rstudio  # by default, the username is set "rstudio"
-      - PASSWORD=rstudio**
     # Select an empty port for the container.
     ports:
       - '8006:8787'
