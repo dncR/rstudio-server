@@ -80,7 +80,32 @@ docker buildx inspect --bootstrap multiarch
 
 ## Step 6: Build and Push Docker Image(s)
 
-Build from a **bake.hcl** configuration file.
+Build from a **bake.hcl** configuration file should start with **exporting build variables** from **.env** file. To export environment variables, run `load_env` script available under **bake/** folder.
+
+### Step 6.1: Enable the "load_env()" function in linux shell.
+
+Add the function [load_env()](https://github.com/dncR/rstudio-server/blob/main/bake/load_env.sh) to your **.bashrc**, **.zshrc**, or another shell configuration file:
+
+```sh
+nano ~/.bashrc
+```
+
+Reload your shell configuration to make the function available in the current session:
+
+```sh
+source ~/.bashrc
+```
+
+Load environment variables from file:
+
+```sh
+# load_env /path/to/file/.env
+load_env ./bake/.env
+````
+
+### Step 6.2: Build Docker image via `docker buildx`.
+
+Build docker images using default environment variables, which are set through **bake/.env** file.
 
 ```sh
 # Load into local image library. 
@@ -89,3 +114,11 @@ Build from a **bake.hcl** configuration file.
 # docker buildx bake --file <path_to_bake_file> --builder multiarch --load
 docker buildx bake --file r-base.hcl --builder multiarch --load
 ```
+
+Change environment variable and build images.
+
+```sh
+# Change R version to 3.6.3
+R_VERSION=3.6.3 docker buildx bake --file r-base.hcl --builder multiarch --load
+```
+
