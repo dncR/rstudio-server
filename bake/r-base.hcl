@@ -3,32 +3,28 @@ group "default" {
   targets = ["r-base"]
 }
 
-variable "R_VERSION" {
-  default = "$R_VERSION"
+variable "DOCKER_HUB_REPO" {
+  default = "ubuntu"
 }
 
 variable "UBUNTU_VERSION" {
-  default = "$UBUNTU_VERSION"
+  default = "jammy"
+}
+
+variable "R_VERSION" {
+  default = "latest"
 }
 
 variable "R_HOME" {
-  default = "$R_HOME"
+  default = "/usr/local/lib/R"
 }
 
 variable "TZ" {
-  default = "$TZ"
+  default = "Etc/UTC"
 }
 
-variable "LANG_SET" {
-  default = "$LANG_SET"
-}
-
-variable "CRAN" {
-  default = "https://p3m.dev/cran/__linux__/${UBUNTU_VERSION}/latest"
-}
-
-variable "DOCKER_HUB_REPO" {
-  default = "$DOCKER_HUB_REPO"
+variable "LANG" {
+  default = "en_US.UTF-8"
 }
 
 target "r-base" {
@@ -52,8 +48,7 @@ target "r-base" {
     "R_VERSION" = "${R_VERSION}"
     "R_HOME" = "${R_HOME}"
     "TZ" = "${TZ}"
-    "CRAN" = "${CRAN}"
-    "LANG" = "${LANG_SET}"
+    "LANG" = "${LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
   }

@@ -1,17 +1,18 @@
-# RStudio Server installation from rocker/rstudio.
+# RStudio Server installation
 ARG R_VERSION
-ARG ARCH
 ARG UBUNTU_VERSION
 
-FROM dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}
+FROM dncr/r-base:${R_VERSION:-latest}-${UBUNTU_VERSION:-jammy}
 
 ARG RSTUDIO_VERSION
 
 ENV S6_VERSION=v2.1.0.2
-ENV RSTUDIO_VERSION=${RSTUDIO_VERSION}
+ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2024.04.2+764}
 ENV DEFAULT_USER=rstudio
 ENV PANDOC_VERSION=default
 ENV QUARTO_VERSION=default
+
+ENV LANG=${LANG:-en_US.UTF-8}
 
 COPY scripts /rocker_scripts
 RUN chmod 777 -R /rocker_scripts
@@ -71,7 +72,7 @@ RUN R CMD javareconf -e
 # RUN echo "rstudio:rstudio**" | chpasswd
 
 # Set LANG from locale.
-RUN locale-gen en_US.UTF-8
+RUN locale-gen ${LANG}
 
 # RStudio server runs on port 8787 by default.
 EXPOSE 8787

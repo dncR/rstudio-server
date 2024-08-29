@@ -3,36 +3,20 @@ group "default" {
   targets = ["rstudio"]
 }
 
+variable "UBUNTU_VERSION" {
+  default = "jammy"
+}
+
 variable "R_VERSION" {
-  default = "$R_VERSION"
+  default = "latest"
 }
 
 variable "RSTUDIO_VERSION" {
-  default = "$RSTUDIO_VERSION"
+  default = "2024.04.2+764"
 }
 
-variable "UBUNTU_VERSION" {
-  default = "$UBUNTU_VERSION"
-}
-
-variable "R_HOME" {
-  default = "$R_HOME"
-}
-
-variable "TZ" {
-  default = "$TZ"
-}
-
-variable "LANG_SET" {
-  default = "$LANG_SET"
-}
-
-variable "CRAN" {
-  default = "https://p3m.dev/cran/__linux__/${UBUNTU_VERSION}/latest"
-}
-
-variable "DOCKER_HUB_REPO" {
-  default = "$DOCKER_HUB_REPO"
+variable "LANG" {
+  default = "en_US.UTF-8"
 }
 
 target "rstudio" {
@@ -55,11 +39,7 @@ target "rstudio" {
   args = {
     "R_VERSION" = "${R_VERSION}"
     "RSTUDIO_VERSION" = "${RSTUDIO_VERSION}"
-    "R_HOME" = "${R_HOME}"
-    "TZ" = "${TZ}"
-    "CRAN" = "${CRAN}"
-    "LANG" = "${LANG_SET}"
+    "LANG" = "${LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
-    "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
   }
 }
