@@ -1,4 +1,4 @@
-# name: rstudio-server
+name: rstudio-server
 
 # Network configurations for ShinyProxy service. Uncomment below code lines to create
 # a user-defined network (disables auto-configured networks).
