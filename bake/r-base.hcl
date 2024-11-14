@@ -23,7 +23,7 @@ variable "TZ" {
   default = "Etc/UTC"
 }
 
-variable "LANG" {
+variable "LANGUAGE" {
   default = "en_US.UTF-8"
 }
 
@@ -48,7 +48,7 @@ target "r-base" {
     "R_VERSION" = "${R_VERSION}"
     "R_HOME" = "${R_HOME}"
     "TZ" = "${TZ}"
-    "LANG" = "${LANG}"
+    "LANG" = "${LANGUAGE}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
   }
