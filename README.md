@@ -82,7 +82,7 @@ docker buildx inspect --bootstrap multiarch
 
 Build from a **bake.hcl** configuration file should start with **setting build variables** from **.env** file. Environment variables for bake process is available in **bake/.env** file.
 
-### Step 6.2: Build Docker image via `docker buildx`.
+### Step 6.1: Build Docker image via `docker buildx`.
 
 Build docker images using default environment variables, which are set through **bake/.env** file.
 
