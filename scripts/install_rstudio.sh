@@ -40,8 +40,8 @@ apt_install \
     libedit2 \
     libobjc4 \
     libpq5 \
-    procps \
-    python-setuptools
+    procps 
+    # python-setuptools
 
 ARCH=$(dpkg --print-architecture)
 
