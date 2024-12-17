@@ -33,15 +33,7 @@ apt_install \
     psmisc \
     pwgen \
     sudo \
-    wget \
-    file \
-    libapparmor1 \
-    libcurl4-openssl-dev \
-    libedit2 \
-    libobjc4 \
-    libpq5 \
-    procps \
-    python-setuptools
+    wget
 
 ARCH=$(dpkg --print-architecture)
 
