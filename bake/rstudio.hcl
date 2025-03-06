@@ -12,10 +12,10 @@ variable "R_VERSION" {
 }
 
 variable "RSTUDIO_VERSION" {
-  default = "2024.04.2+764"
+  default = "2024.12.1+563"
 }
 
-variable "LANG" {
+variable "R_LANG" {
   default = "en_US.UTF-8"
 }
 
@@ -39,7 +39,7 @@ target "rstudio" {
   args = {
     "R_VERSION" = "${R_VERSION}"
     "RSTUDIO_VERSION" = "${RSTUDIO_VERSION}"
-    "LANG" = "${LANG}"
+    "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
   }
 }
