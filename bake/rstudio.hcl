@@ -32,7 +32,7 @@ target "rstudio" {
     "org.opencontainers.image.authors" = "Dincer Goksuluk <dincergoksuluk@erciyes.edu.tr>"
   }
 
-  platforms = ["linux/amd64","linux/arm64/v8"]
+  platforms = ["linux/amd64","linux/arm64"]
 
   tags = ["dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}"]
 
