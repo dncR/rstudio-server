@@ -71,10 +71,6 @@ RUN apt-get update && apt-get install -y default-jdk \
   
 RUN R CMD javareconf -e
 
-# Set "rstudio" password so that we can login
-# Comment the next line if the password is set through Docker Compose file using "environment" variable
-# RUN echo "rstudio:rstudio**" | chpasswd
-
 # Set LANG from locale.
 RUN locale-gen ${LANG}
 
