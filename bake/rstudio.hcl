@@ -11,12 +11,12 @@ variable "R_VERSION" {
   default = "latest"
 }
 
-variable "RSTUDIO_VERSION" {
-  default = "2024.12.1+563"
-}
-
 variable "R_LANG" {
   default = "en_US.UTF-8"
+}
+
+variable "RSTUDIO_VERSION" {
+  default = "2024.12.1+563"
 }
 
 target "rstudio" {
@@ -32,7 +32,7 @@ target "rstudio" {
     "org.opencontainers.image.authors" = "Dincer Goksuluk <dincergoksuluk@erciyes.edu.tr>"
   }
 
-  platforms = ["linux/amd64","linux/arm64"]
+  platforms = ["linux/amd64", "linux/arm64"]
   
   cache-to = [
     {
@@ -55,8 +55,18 @@ target "rstudio" {
     },
 
     {
+      ref = "docker.io/dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      type = "registry"
+    },
+
+    {
       type = "local",
       src = "/tmp/docker/cache/r-base-${R_VERSION}-${UBUNTU_VERSION}"
+    },
+
+    {
+      type = "local",
+      src = "/tmp/docker/cache/rstudio-server-${R_VERSION}-${UBUNTU_VERSION}"
     }
   ]
 
