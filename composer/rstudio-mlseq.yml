@@ -1,8 +1,0 @@
-services:    
-  mlseq-devel:
-    image: dncr/rstudio-server:mlseq-devel-4.1.1
-    build:
-      context: ../
-      dockerfile: dockerfiles/rstudio-mlseq.Dockerfile
-
-
