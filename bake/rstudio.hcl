@@ -33,6 +33,32 @@ target "rstudio" {
   }
 
   platforms = ["linux/amd64","linux/arm64"]
+  
+  cache-to = [
+    {
+      type = "registry",
+      ref = "docker.io/dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      mode = "max"
+    },
+    
+    {
+      type = "local",
+      dest = "/tmp/docker/cache/rstudio-server-${R_VERSION}-${UBUNTU_VERSION}",
+      mode = "max"
+    }
+  ]
+
+  cache-from = [
+    {
+      ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      type = "registry"
+    },
+
+    {
+      type = "local",
+      src = "/tmp/docker/cache/r-base-${R_VERSION}-${UBUNTU_VERSION}"
+    }
+  ]
 
   tags = ["dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}"]
 
