@@ -19,6 +19,10 @@ variable "RSTUDIO_VERSION" {
   default = "2024.12.1+563"
 }
 
+variable "PREINSTALL_R_PKG" {
+  default = "false"
+}
+
 target "rstudio" {
   context = "../"
   dockerfile = "dockerfiles/rstudio.Dockerfile"
@@ -77,5 +81,6 @@ target "rstudio" {
     "RSTUDIO_VERSION" = "${RSTUDIO_VERSION}"
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
+    "PREINSTALL_R_PKG" = "${PREINSTALL_R_PKG}"
   }
 }

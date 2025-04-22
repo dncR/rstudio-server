@@ -5,6 +5,7 @@ ARG UBUNTU_VERSION
 FROM dncr/r-base:${R_VERSION:-latest}-${UBUNTU_VERSION:-jammy}
 
 ARG RSTUDIO_VERSION
+ARG PREINSTALL_R_PKG
 
 ENV S6_VERSION=v2.1.0.2
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2024.04.2+764}
@@ -58,8 +59,11 @@ RUN apt-get update && apt-get install -y qpdf \
   ghostscript-x
 
 # Install R packages for package developement
-RUN R -e "install.packages('devtools')" && \
-    R -e "install.packages('BiocManager')"
+# RUN R -e "install.packages('devtools')" && \
+#     R -e "install.packages('BiocManager')"
+
+# Preinstalled R packages for package developement
+RUN /rocker_scripts/preinstall_r_packages.sh
 
 # Install Java and Reconfigure Java for R
 RUN apt-get update && apt-get install -y default-jdk \
