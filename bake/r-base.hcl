@@ -29,6 +29,7 @@ variable "R_LANG" {
 
 target "r-base" {
   context = "../"
+  
   dockerfile = "dockerfiles/r-base.Dockerfile"
 
   labels = {
@@ -40,9 +41,35 @@ target "r-base" {
     "org.opencontainers.image.authors" = "Dincer Goksuluk <dincergoksuluk@erciyes.edu.tr>"
   }
 
-  platforms = ["linux/amd64","linux/arm64"]
-
   tags = ["dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}"]
+  
+  cache-to = [
+    {
+      type = "registry",
+      ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      mode = "max"
+    },
+    
+    {
+      type = "local",
+      dest = "/tmp/docker/cache/r-base-${R_VERSION}-${UBUNTU_VERSION}",
+      mode = "max"
+    }
+  ]
+
+  cache-from = [
+    {
+      ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      type = "registry"
+    },
+
+    {
+      type = "local",
+      src = "/tmp/docker/cache/r-base-${R_VERSION}-${UBUNTU_VERSION}"
+    }
+  ]
+  
+  platforms = ["linux/amd64", "linux/arm64"]
 
   args = {
     "R_VERSION" = "${R_VERSION}"
