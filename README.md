@@ -97,7 +97,7 @@ docker buildx bake --file r-base.hcl --builder multiarch --load
 Change environment variable and build images.
 
 ```sh
-# Change R version to 3.6.3
-R_VERSION=3.6.3 docker buildx bake --file r-base.hcl --builder multiarch --load
+# Change R version to 4.4.3
+R_VERSION=4.4.3 docker buildx bake --file r-base.hcl --builder multiarch --load
 ```
 
