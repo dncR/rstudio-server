@@ -20,6 +20,7 @@ ENV CRAN=${CRAN:-https://p3m.dev/cran/__linux__/${UBUNTU_VERSION:-jammy}/latest}
 ENV LANG=${LANG:-en_US.UTF-8}
 ENV DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-noninteractive}
 
+# Ubuntu packages not included in "install_R_source.sh" or "setup_R.sh"
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         gcc \
