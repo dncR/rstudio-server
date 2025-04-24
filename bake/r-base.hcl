@@ -27,6 +27,10 @@ variable "R_LANG" {
   default = "en_US.UTF-8"
 }
 
+variable "DEBIAN_FRONTEND" {
+  default = "noninteractive"
+}
+
 target "r-base" {
   context = "../"
   
@@ -78,5 +82,6 @@ target "r-base" {
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
+    "DEBIAN_FRONTEND" = "${DEBIAN_FRONTEND}"
   }
 }
