@@ -58,10 +58,6 @@ RUN apt-get update && apt-get install -y libz-dev \
 RUN apt-get update && apt-get install -y qpdf \
   ghostscript-x
 
-# Install R packages for package developement
-# RUN R -e "install.packages('devtools')" && \
-#     R -e "install.packages('BiocManager')"
-
 # Preinstalled R packages for package developement
 RUN /rocker_scripts/preinstall_r_packages.sh
 
