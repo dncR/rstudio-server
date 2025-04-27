@@ -45,3 +45,5 @@ vignettes/*.pdf
 externalvolume/
 IgnoredFiles/
 
+bake/template.hcl
+dockerfiles/template.Dockerfile
