@@ -6,6 +6,7 @@ FROM dncr/r-base:${R_VERSION:-latest}-${UBUNTU_VERSION:-jammy}
 
 ARG RSTUDIO_VERSION
 ARG PREINSTALL_R_PKG
+ARG INSTALL_TEX
 
 ENV S6_VERSION=v2.1.0.2
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2024.04.2+764}
@@ -60,6 +61,9 @@ RUN apt-get update && apt-get install -y qpdf \
 
 # Preinstalled R packages for package developement
 RUN /rocker_scripts/preinstall_r_packages.sh
+
+# Tex Live Installation
+RUN /rocker_scripts/texlive_full.sh
 
 # Install Java and Reconfigure Java for R
 RUN apt-get update && apt-get install -y default-jdk \

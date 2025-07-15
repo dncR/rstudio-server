@@ -1,4 +1,3 @@
-
 group "default" {
   targets = ["rstudio"]
 }
@@ -20,6 +19,10 @@ variable "RSTUDIO_VERSION" {
 }
 
 variable "PREINSTALL_R_PKG" {
+  default = "false"
+}
+
+variable "INSTALL_TEX" {
   default = "false"
 }
 
@@ -82,5 +85,6 @@ target "rstudio" {
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "PREINSTALL_R_PKG" = "${PREINSTALL_R_PKG}"
+    "INSTALL_TEX" = "${INSTALL_TEX}"
   }
 }
