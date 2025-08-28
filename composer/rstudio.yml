@@ -1,4 +1,3 @@
-name: rstudio-server
 
 # Network configurations for ShinyProxy service. Uncomment below code lines to create
 # a user-defined network (disables auto-configured networks).
@@ -9,7 +8,6 @@ name: rstudio-server
 services:
   rstudio-server:
     # Define container name before building it.
-    container_name: rstudio-${R_VERSION}
     # To build the image locally, comment out "image" below, and uncomment
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
@@ -36,15 +34,19 @@ services:
     user: 'root'
     # Select an empty port for the container.
     ports:
-      - '8006:8787'
     volumes:
       # Set external volumes.
       # User-specific container (external volume). Files in this folder will be stored as an external volume
       # out of docker container. If docker container was removed, external files will be remained in the main 
       # computer. Multiple volumes can be defined.
-      - /home/dncr:/home/rstudio/externalvolume
-      #  - /Users/dncr:/home/rstudio/externalvolume
+      # - /home/dncr:/home/rstudio/externalvolume
+      - /Users/dncr:/home/rstudio/externalvolume
       #  - /Volumes:/home/rstudio/externalmedia
+    # Number of open files limits.
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     #deploy:
     #  resources:
     #    limits:
