@@ -24,7 +24,8 @@ ENV DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-noninteractive}
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         gcc \
-        libxml2-dev
+        libxml2-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY scripts/install_R_source.sh /rocker_scripts/install_R_source.sh
 RUN /rocker_scripts/install_R_source.sh

@@ -53,11 +53,13 @@ RUN apt-get update && apt-get install -y libz-dev \
   libglpk-dev \
   libharfbuzz-dev \
   libfribidi-dev \
-  libgit2-dev
+  libgit2-dev && \
+  rm -rf /var/lib/apt/lists/*
 
 # Ubuntu packages required for "R CMD check"
 RUN apt-get update && apt-get install -y qpdf \
-  ghostscript-x
+  ghostscript-x && \
+  rm -rf /var/lib/apt/lists/*
 
 # Preinstalled R packages for package developement
 RUN /rocker_scripts/preinstall_r_packages.sh
@@ -67,7 +69,8 @@ RUN /rocker_scripts/texlive_full.sh
 
 # Install Java and Reconfigure Java for R
 RUN apt-get update && apt-get install -y default-jdk \
-    default-jre
+    default-jre && \
+    rm -rf /var/lib/apt/lists/*
   
 RUN R CMD javareconf -e
 
