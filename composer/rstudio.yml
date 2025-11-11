@@ -12,41 +12,24 @@ services:
     # "build" and the lines indented under it.
     # Use local images created using a dockerfile.
     image: dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}
-    #build:
-    #  context: ../
-    #  dockerfile: dockerfiles/rstudio.Dockerfile
-    #  args:
-    #    - RSTUDIO_VERSION=${RSTUDIO_VERSION}
-    #    - R_VERSION=${R_VERSION}
-    #    - ARCH=${ARCH}
-    #    - UBUNTU_VERSION=${UBUNTU_VERSION}
     env_file:
       - .env
     # Define extra environments not specified in "env_file".
+    # Export RSTUDIO_PASSWORD before running compose (e.g., `export RSTUDIO_PASSWORD=...`)
+    # so the container picks it up without hard-coding credentials in this file.
     environment:
       # - USER=rstudio  # by default, the username is set "rstudio"
-      - PASSWORD=rstudio**
+      - PASSWORD=${RSTUDIO_PASSWORD:?Set RSTUDIO_PASSWORD in your shell before running docker compose}
     # set restart policit for the container
     restart: "unless-stopped"
-    # Setting this to something other than 'root' will cause shiny apps not to
-    # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
-    # below.
-    user: 'root'
+    # Run as the unprivileged default user. Switch to root only if a specific workflow requires it.
+    user: 'rstudio'
     # Select an empty port for the container.
     ports:
+      - '8787:8009'
     volumes:
-      # Set external volumes.
-      # User-specific container (external volume). Files in this folder will be stored as an external volume
-      # out of docker container. If docker container was removed, external files will be remained in the main 
-      # computer. Multiple volumes can be defined.
-      # - /home/dncr:/home/rstudio/externalvolume
-      - /Users/dncr:/home/rstudio/externalvolume
-      #  - /Volumes:/home/rstudio/externalmedia
-    # Number of open files limits.
-    ulimits:
-      nofile:
-        soft: 65535
-        hard: 65535
+      # Bind mounts are optional. Uncomment and point to a valid host path if you want to persist workspaces.
+      # - ./projects:/home/rstudio/projects
     #deploy:
     #  resources:
     #    limits:
