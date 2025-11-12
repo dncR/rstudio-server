@@ -30,9 +30,13 @@ services:
     # Select an empty port for the container.
     ports:
       - '8005:8787'
+      # Map a host SSH port to the container's sshd (set the host side as needed, e.g., 2222).
+      - '2222:22'
     volumes:
       # Bind mounts are optional. Uncomment and point to a valid host path if you want to persist workspaces.
       - '/Users/dncr:/home/rstudio/externalvolume'
+      # Mount your public key to authorize SSH sessions (update the host path).
+      - ~/.ssh/id_ed25519.pub:/home/rstudio/.ssh/authorized_keys:ro
     #deploy:
     #  resources:
     #    limits:

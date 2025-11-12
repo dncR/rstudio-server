@@ -56,6 +56,25 @@ RUN apt-get update && apt-get install -y libz-dev \
   libgit2-dev && \
   rm -rf /var/lib/apt/lists/*
 
+# Install OpenSSH server for remote development access
+RUN apt-get update && apt-get install -y openssh-server && \
+  rm -rf /var/lib/apt/lists/*
+
+# Configure SSH daemon and default authorized_keys location
+RUN mkdir -p /var/run/sshd /home/rstudio/.ssh && \
+  chown rstudio:rstudio /home/rstudio/.ssh && \
+  chmod 700 /home/rstudio/.ssh && \
+  sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+  echo "PermitRootLogin no" >> /etc/ssh/sshd_config && \
+  echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
+
+# Manage sshd under s6 supervision
+RUN mkdir -p /etc/services.d/ssh && \
+  cat <<"EOF" >/etc/services.d/ssh/run
+#!/usr/bin/with-contenv bash
+exec /usr/sbin/sshd -D -e
+EOF
+
 # Ubuntu packages required for "R CMD check"
 RUN apt-get update && apt-get install -y qpdf \
   ghostscript-x && \
@@ -77,8 +96,7 @@ RUN R CMD javareconf -e
 # Set LANG from locale.
 RUN locale-gen ${LANG}
 
-# RStudio server runs on port 8787 by default.
-EXPOSE 8787
+# RStudio server runs on port 8787 by default. SSH uses 22.
+EXPOSE 22 8787
 
 CMD ["/init"]
-
