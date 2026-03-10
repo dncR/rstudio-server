@@ -105,6 +105,13 @@ R_VERSION=4.4.3 UBUNTU_VERSION=jammy docker buildx bake --file r-base.hcl --buil
 R_VERSION=4.4.3 UBUNTU_VERSION=jammy RSTUDIO_VERSION=2024.12.1+563 PREINSTALL_R_PKG=true INSTALL_TEX=false docker buildx bake --file rstudio.hcl --builder multiarch --load
 ```
 
+For `rstudio.hcl`, the extra args below control optional image customizations:
+
+- `INSTALL_TEX=true`: installs the full TeX Live distribution from Ubuntu's `apt` repository using `scripts/texlive_full.sh`.
+- `PREINSTALL_R_PKG=true`: installs pre-defined R packages from `scripts/preinstall_r_packages.sh` while building the image.
+  By default, this script installs `devtools` and `BiocManager`.
+  Developers can extend this script to preinstall additional R packages as needed.
+
 ### Step 6.2 (Optional): Use a `.env` file instead of typing variables every time
 
 If you prefer, keep build variables in a local `.env` file and export them before build:
