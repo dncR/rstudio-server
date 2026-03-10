@@ -80,24 +80,41 @@ docker buildx inspect --bootstrap multiarch
 
 ## Step 6: Build and Push Docker Image(s)
 
-Build from a **bake.hcl** configuration file should start with **setting build variables** from **.env** file. Environment variables for bake process is available in **bake/.env** file.
+Build from a **bake.hcl** configuration file starts with setting required environment variables.
+The default workflow is to pass variables directly in the terminal when running `docker buildx bake`.
 
 ### Step 6.1: Build Docker image via `docker buildx`.
 
-Build docker images using default environment variables, which are set through **bake/.env** file.
+Build docker images by passing variables inline:
 
 ```sh
 # Load into local image library. 
 # (Use --push to push created image directly to the Docker Hub repository. Login required.)
 
 # docker buildx bake --file <path_to_bake_file> --builder multiarch --load
+R_VERSION=latest UBUNTU_VERSION=jammy docker buildx bake --file r-base.hcl --builder multiarch --load
+```
+
+Change environment variables and build images:
+
+```sh
+# Build a specific R version
+R_VERSION=4.4.3 UBUNTU_VERSION=jammy docker buildx bake --file r-base.hcl --builder multiarch --load
+
+# Build RStudio image with extra bake args
+R_VERSION=4.4.3 UBUNTU_VERSION=jammy RSTUDIO_VERSION=2024.12.1+563 PREINSTALL_R_PKG=true INSTALL_TEX=false docker buildx bake --file rstudio.hcl --builder multiarch --load
+```
+
+### Step 6.2 (Optional): Use a `.env` file instead of typing variables every time
+
+If you prefer, keep build variables in a local `.env` file and export them before build:
+
+```sh
+set -a
+source .env
+set +a
+
 docker buildx bake --file r-base.hcl --builder multiarch --load
 ```
 
-Change environment variable and build images.
-
-```sh
-# Change R version to 4.4.3
-R_VERSION=4.4.3 docker buildx bake --file r-base.hcl --builder multiarch --load
-```
-
+This is optional and useful when you build frequently with the same variable set.

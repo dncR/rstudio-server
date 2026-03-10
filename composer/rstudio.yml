@@ -23,9 +23,10 @@ services:
     environment:
       # - USER=rstudio  # by default, the username is set "rstudio"
       - PASSWORD=${RSTUDIO_PASSWORD:?Set RSTUDIO_PASSWORD in your shell before running docker compose}
-    # set restart policit for the container
+    # Set restart policy for the container.
     restart: "unless-stopped"
-    # Run as the unprivileged default user. Switch to root only if a specific workflow requires it.
+    # This compose profile runs as root for admin/package-install workflows.
+    # If you do not need root-level operations, set `user: 'rstudio'`.
     user: 'root'
     # Select an empty port for the container.
     ports:
