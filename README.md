@@ -92,20 +92,20 @@ Build docker images by passing variables inline:
 # (Use --push to push created image directly to the Docker Hub repository. Login required.)
 
 # docker buildx bake --file <path_to_bake_file> --builder multiarch --load
-R_VERSION=latest UBUNTU_VERSION=jammy docker buildx bake --file r-base.hcl --builder multiarch --load
+R_VERSION=latest UBUNTU_VERSION=noble docker buildx bake --file bake/r-base.hcl --builder multiarch --load
 ```
 
 Change environment variables and build images:
 
 ```sh
 # Build a specific R version
-R_VERSION=4.4.3 UBUNTU_VERSION=jammy docker buildx bake --file r-base.hcl --builder multiarch --load
+R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/r-base.hcl --builder multiarch --load
 
 # Build RStudio image with extra bake args
-R_VERSION=4.4.3 UBUNTU_VERSION=jammy RSTUDIO_VERSION=2024.12.1+563 PREINSTALL_R_PKG=true INSTALL_TEX=false docker buildx bake --file rstudio.hcl --builder multiarch --load
+R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 PREINSTALL_R_PKG=true INSTALL_TEX=false docker buildx bake --file bake/rstudio.hcl --builder multiarch --load
 ```
 
-For `rstudio.hcl`, the extra args below control optional image customizations:
+For `bake/rstudio.hcl`, the extra args below control optional image customizations:
 
 - `INSTALL_TEX=true`: installs the full TeX Live distribution from Ubuntu's `apt` repository using `scripts/texlive_full.sh`.
 - `PREINSTALL_R_PKG=true`: installs pre-defined R packages from `scripts/preinstall_r_packages.sh` while building the image.
@@ -114,14 +114,22 @@ For `rstudio.hcl`, the extra args below control optional image customizations:
 
 ### Step 6.2 (Optional): Use a `.env` file instead of typing variables every time
 
-If you prefer, keep build variables in a local `.env` file and export them before build:
+If you prefer, keep build variables in a local `.env` file and export them before build.
+For the default Noble build, create a repo-root `.env` with values such as:
+
+```sh
+R_VERSION=latest
+UBUNTU_VERSION=noble
+```
+
+Then export those variables before running bake:
 
 ```sh
 set -a
 source .env
 set +a
 
-docker buildx bake --file r-base.hcl --builder multiarch --load
+docker buildx bake --file bake/r-base.hcl --builder multiarch --load
 ```
 
 This is optional and useful when you build frequently with the same variable set.
