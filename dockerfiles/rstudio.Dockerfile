@@ -2,14 +2,14 @@
 ARG R_VERSION
 ARG UBUNTU_VERSION
 
-FROM dncr/r-base:${R_VERSION:-latest}-${UBUNTU_VERSION:-jammy}
+FROM dncr/r-base:${R_VERSION:-latest}-${UBUNTU_VERSION:-noble}
 
 ARG RSTUDIO_VERSION
 ARG PREINSTALL_R_PKG
 ARG INSTALL_TEX
 
 ENV S6_VERSION=v2.1.0.2
-ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2024.04.2+764}
+ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2026.04.0+526}
 ENV DEFAULT_USER=rstudio
 ENV PANDOC_VERSION=default
 ENV QUARTO_VERSION=default
@@ -26,8 +26,12 @@ RUN /rocker_scripts/install_quarto.sh
 # Working directory within container.
 WORKDIR /home/rstudio/
 
-# Add opencpu user to sudoers
-RUN adduser rstudio sudo
+# Keep sudo access opt-in at container runtime instead of baking it into
+# the image. When ROOT=true is provided at startup, init_userconf.sh adds the
+# runtime user to the sudo group and enables passwordless sudo. If build-time
+# sudo access is intentionally required for every image, uncomment the command
+# below and use usermod to avoid depending on the optional adduser package.
+# RUN usermod -aG sudo rstudio
 
 # Set permissions for R site-library
 # This step enables rstudio-server to write into site-library folders.
