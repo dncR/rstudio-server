@@ -26,6 +26,10 @@ variable "R_LANG" {
   default = "en_US.UTF-8"
 }
 
+variable "CRAN" {
+  default = "https://p3m.dev/cran/__linux__/${UBUNTU_VERSION}/latest"
+}
+
 variable "DEBIAN_FRONTEND" {
   default = "noninteractive"
 }
@@ -78,6 +82,7 @@ target "r-base" {
     "R_VERSION" = "${R_VERSION}"
     "R_HOME" = "${R_HOME}"
     "TZ" = "${TZ}"
+    "CRAN" = "${CRAN}"
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
