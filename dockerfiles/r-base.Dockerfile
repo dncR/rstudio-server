@@ -2,7 +2,7 @@
 ARG UBUNTU_VERSION
 ARG DOCKER_HUB_REPO
 
-FROM ${DOCKER_HUB_REPO:-ubuntu}:${UBUNTU_VERSION:-jammy}
+FROM ${DOCKER_HUB_REPO:-ubuntu}:${UBUNTU_VERSION:-noble}
 
 ARG UBUNTU_VERSION
 ARG R_VERSION
@@ -16,7 +16,7 @@ ARG DEBIAN_FRONTEND
 ENV R_VERSION=${R_VERSION:-latest}
 ENV R_HOME=${R_HOME:-/usr/local/lib/R}
 ENV TZ=${TZ:-Etc/UTC}
-ENV CRAN=${CRAN:-https://p3m.dev/cran/__linux__/${UBUNTU_VERSION:-jammy}/latest}
+ENV CRAN=${CRAN:-https://p3m.dev/cran/__linux__/${UBUNTU_VERSION:-noble}/latest}
 ENV LANG=${LANG:-en_US.UTF-8}
 ENV DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-noninteractive}
 
