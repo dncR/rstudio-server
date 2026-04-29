@@ -59,7 +59,7 @@ if [ "$UBUNTU_CODENAME" = "focal" ]; then
     UBUNTU_CODENAME="bionic"
 fi
 
-if [ "$UBUNTU_CODENAME" = "noble" ]; then
+if [ "$UBUNTU_CODENAME" = "noble" ] || [ "$UBUNTU_CODENAME" = "resolute" ]; then
     UBUNTU_CODENAME="jammy"
 fi
 
