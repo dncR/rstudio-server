@@ -34,7 +34,12 @@ COPY scripts /rocker_scripts
 
 # RUN /rocker_scripts/setup_R.sh
 RUN <<EOF
-if grep -q "1000" /etc/passwd; then
+## Use getent to match UID 1000 exactly before removing the default user.
+## Previous broad match could trigger on any /etc/passwd field containing 1000.
+# if grep -q "1000" /etc/passwd; then
+#     userdel --remove "$(id -un 1000)";
+# fi
+if getent passwd 1000 >/dev/null; then
     userdel --remove "$(id -un 1000)";
 fi
 /rocker_scripts/setup_R.sh
