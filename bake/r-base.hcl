@@ -7,7 +7,7 @@ variable "DOCKER_HUB_REPO" {
 }
 
 variable "UBUNTU_VERSION" {
-  default = "jammy"
+  default = "noble"
 }
 
 variable "R_VERSION" {

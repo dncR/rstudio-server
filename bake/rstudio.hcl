@@ -3,7 +3,7 @@ group "default" {
 }
 
 variable "UBUNTU_VERSION" {
-  default = "jammy"
+  default = "noble"
 }
 
 variable "R_VERSION" {
@@ -15,7 +15,7 @@ variable "R_LANG" {
 }
 
 variable "RSTUDIO_VERSION" {
-  default = "2024.12.1+563"
+  default = "2026.04.0+526"
 }
 
 variable "PREINSTALL_R_PKG" {
