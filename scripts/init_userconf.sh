@@ -166,13 +166,15 @@ fi
 ## Add a password to user
 echo "$USER:$PASSWORD" | chpasswd
 
-# Use Env flag to know if user should be added to sudoers
+# Use Env flag to know if user should be added to sudoers. Use usermod instead
+# of Debian/Ubuntu's optional adduser helper so this path works on minimal base
+# images where adduser is not installed.
 if [ "${RUNROOTLESS}" = "true" ]; then
     echo "No sudoers changes needed when running rootless"
 elif [[ ${ROOT,,} == "true" ]]; then
     line='%sudo ALL=(ALL) NOPASSWD:ALL'
     sudoers_file='/etc/sudoers'
-    adduser "$USER" sudo && { grep -qxF "$line" "$sudoers_file" || echo "$line"  >> "$sudoers_file"; }
+    usermod -aG sudo "$USER" && { grep -qxF "$line" "$sudoers_file" || echo "$line"  >> "$sudoers_file"; }
     echo "$USER added to sudoers"
 fi
 
