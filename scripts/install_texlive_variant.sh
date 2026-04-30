@@ -25,7 +25,8 @@ case "$TEX_VARIANT" in
             texlive-fonts-recommended \
             texlive-fonts-extra
         rm -rf /var/lib/apt/lists/*
-        updmap-user
+        mktexlsr
+        updmap-sys
         metadata_set_module "tex" "base"
         ;;
     extra)
@@ -46,7 +47,8 @@ case "$TEX_VARIANT" in
             texlive-fonts-extra \
             texlive-extra-utils
         rm -rf /var/lib/apt/lists/*
-        updmap-user
+        mktexlsr
+        updmap-sys
         metadata_set_module "tex" "extra"
         ;;
     full)
@@ -60,7 +62,8 @@ case "$TEX_VARIANT" in
         apt-get update
         apt-get install -y --no-install-recommends texlive-full
         rm -rf /var/lib/apt/lists/*
-        updmap-user
+        mktexlsr
+        updmap-sys
         metadata_set_module "tex" "full"
         ;;
     *)

@@ -48,20 +48,34 @@ metadata_write() {
     local ssh="$7"
     local r_version
     local ubuntu_version
+    local default_user
+    local rstudio_version
+    local tex_variant_requested
 
     r_version=${R_VERSION:-$(metadata_string "r_version")}
     ubuntu_version=${UBUNTU_VERSION:-$(metadata_string "ubuntu_version")}
+    default_user=${DEFAULT_USER:-$(metadata_string "default_user")}
+    rstudio_version=${RSTUDIO_VERSION:-$(metadata_string "rstudio_version")}
+    tex_variant_requested=${TEX_VARIANT:-$(metadata_string "tex_variant")}
     [ -n "$r_version" ] || r_version="unknown"
     [ -n "$ubuntu_version" ] || ubuntu_version="unknown"
+    [ -n "$default_user" ] || default_user="unknown"
+    [ -n "$rstudio_version" ] || rstudio_version="unknown"
+    [ -n "$tex_variant_requested" ] || tex_variant_requested="none"
 
     mkdir -p "$BUILD_METADATA_DIR"
     cat > "$BUILD_METADATA_FILE" <<EOF
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "image": "$image",
   "r_version": "$r_version",
   "ubuntu_version": "$ubuntu_version",
+  "default_user": "$default_user",
+  "rstudio_version": "$rstudio_version",
   "r_base_mode": "$r_base_mode",
+  "requested": {
+    "tex_variant": "$tex_variant_requested"
+  },
   "modules": {
     "r_dev_deps": $r_dev_deps,
     "r_cmd_check_deps": $r_cmd_check_deps,

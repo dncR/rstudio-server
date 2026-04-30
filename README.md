@@ -137,6 +137,11 @@ on top of the inherited `r-base` image.
 The RStudio Server image uses `DEFAULT_USER=rstudio` by default. If you build an
 image with a different `DEFAULT_USER`, use the same value in Compose so runtime
 paths, SSH keys, and login credentials target the correct user home.
+Treat this as a hard requirement: if the build-time `DEFAULT_USER`, the Compose
+`.env` value, and any exported shell `DEFAULT_USER` value do not match, Compose
+startup or login can fail. Shell environment variables take precedence over
+values loaded from `.env`, so check `env | grep DEFAULT_USER` when debugging a
+user/path mismatch.
 
 Image tags encode the R and Ubuntu versions, not the optional build modules.
 Rebuilding the same tag with different build arguments can produce images with
@@ -148,7 +153,9 @@ docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \
   cat /usr/local/share/rstudio-server-build/modules.json
 ```
 
-The same metadata path is available in `dncr/r-base` images.
+The same metadata path is available in `dncr/r-base` images. The JSON records
+the build user, RStudio version, requested TeX variant, and installed optional
+modules.
 
 ### Step 6.2 (Optional): Use a `.env` file instead of typing variables every time
 
@@ -190,6 +197,9 @@ their respective `experimental` directories:
 
 Treat these files as experimental until the Shiny Server package source and
 platform support are verified for the target Ubuntu/R combination.
+The canonical image build context excludes `scripts/experimental/` through
+`.dockerignore`, so experimental image builds that depend on those scripts may
+need a dedicated build context rule before use.
 
 ## Acknowledgement
 

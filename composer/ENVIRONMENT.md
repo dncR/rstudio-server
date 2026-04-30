@@ -59,6 +59,9 @@ the image.
 
 Do not use `USER` or `HOME` for Compose interpolation. Host shells commonly
 export those names, and shell variables take precedence over `.env` values.
+The same precedence applies to `DEFAULT_USER`: an exported shell value overrides
+the value in `.env`. Keep the build-time value, `.env` value, and shell
+environment value aligned, or unset the shell value before running Compose.
 
 `USERID` and `GROUPID` let the container runtime user match a host UID/GID when
 needed for mounted volume ownership.
@@ -82,6 +85,11 @@ Compose relative to the compose file location.
 `SSH_PUBLIC_KEY` must point to an existing public key file on the host. It is
 mounted read-only as `/home/${DEFAULT_USER}/.ssh/authorized_keys`. SSH access also
 requires an image built with `INSTALL_SSH=true`.
+
+Because the Compose template always declares the SSH key mount, an invalid
+`SSH_PUBLIC_KEY` path can interrupt `docker compose up`. Confirm that
+`INSTALL_SSH=true` was used for the image and that the key path and filename are
+correct before connecting over SSH.
 
 ## Restart Policy
 
@@ -118,6 +126,7 @@ without the full R development dependency set.
 
 Image tags encode R and Ubuntu versions, not optional modules. Inspect
 `/usr/local/share/rstudio-server-build/modules.json` inside an image to see the
-actual optional module state.
+actual optional module state, build user, RStudio version, and requested TeX
+variant.
 
 See the root `README.md` for build examples.

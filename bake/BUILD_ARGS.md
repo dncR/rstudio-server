@@ -41,6 +41,11 @@ see which modules were installed.
 | `INSTALL_JAVA` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs Java and runs `R CMD javareconf -e`. This is forced to `true` when `INSTALL_R_DEV_DEPS=true`. |
 | `INSTALL_SSH` | `false` | `rstudio` | `true`, `false` | Installs and configures OpenSSH Server under s6 supervision. This is only applied to the `rstudio` image. |
 
+Shell environment variables are read by `docker buildx bake` before defaults in
+this file. If `DEFAULT_USER`, `TEX_VARIANT`, or another build argument is
+exported in your shell, that value overrides the HCL default. Check the active
+environment before debugging unexpected build output.
+
 ## Target Behavior
 
 ### `r-base`
@@ -93,11 +98,16 @@ Example:
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "image": "rstudio",
   "r_version": "4.6.0",
   "ubuntu_version": "noble",
+  "default_user": "rstudio",
+  "rstudio_version": "2026.04.0+526",
   "r_base_mode": "dev",
+  "requested": {
+    "tex_variant": "base"
+  },
   "modules": {
     "r_dev_deps": true,
     "r_cmd_check_deps": true,

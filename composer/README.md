@@ -55,6 +55,12 @@ Do not use `USER` or `HOME` for Compose interpolation in this file. Those names
 are commonly exported by the host shell and can override `.env` values during
 Compose interpolation. Use `DEFAULT_USER` for the RStudio login user.
 
+If you use a custom image built with a non-default `DEFAULT_USER`, the value in
+`.env`, the value used during build, and any exported shell `DEFAULT_USER` value
+must match. If they do not match, Compose can mount files into the wrong home
+directory or the container startup can fail. Shell environment variables override
+values from `.env`, so unset conflicting shell variables before running Compose.
+
 ## Running the Container
 
 Pull the configured image:
@@ -88,6 +94,12 @@ docker compose --env-file .env -f rstudio.yml down
 SSH access requires an image built with `INSTALL_SSH=true`. The Compose template
 can map the port and key for SSH, but a minimal RStudio image does not install
 the OpenSSH server unless that build arg is enabled.
+
+The Compose file always includes the SSH port and public-key mount. If the image
+was not built with `INSTALL_SSH=true`, SSH connections to `SSH_PORT` will fail.
+If `SSH_PUBLIC_KEY` does not point to an existing public key file, or if the path
+or filename is wrong, `docker compose up` can fail before the container starts.
+Verify both the image metadata and the key path before treating SSH as available.
 
 The example Compose file maps the host public key specified by
 `SSH_PUBLIC_KEY` to:
@@ -124,7 +136,8 @@ docker buildx bake --file ../bake/image-builds.hcl --set '*.platform=linux/arm64
 ```
 
 Published tags encode the R and Ubuntu versions, not optional build modules.
-Check the image metadata to see which optional modules were included:
+Check the image metadata to see which optional modules, build user, RStudio
+version, and requested TeX variant were included:
 
 ```sh
 docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \

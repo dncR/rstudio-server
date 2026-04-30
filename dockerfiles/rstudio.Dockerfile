@@ -39,7 +39,7 @@ WORKDIR /home/${DEFAULT_USER}/
 # runtime user to the sudo group and enables passwordless sudo. If build-time
 # sudo access is intentionally required for every image, uncomment the command
 # below and use usermod to avoid depending on the optional adduser package.
-# RUN usermod -aG sudo rstudio
+# RUN usermod -aG sudo ${DEFAULT_USER}
 
 # Allow RStudio users in the staff group to install/update site-library packages
 # without making the library world-writable.

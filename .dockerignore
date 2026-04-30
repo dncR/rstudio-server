@@ -39,3 +39,6 @@ Thumbs.db
 # Local templates and scratch files
 bake/template.hcl
 dockerfiles/template.Dockerfile
+
+# Experimental scripts are not part of the canonical image build workflow
+scripts/experimental/
