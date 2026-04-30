@@ -123,6 +123,14 @@ R_VERSION=4.6.0 UBUNTU_VERSION=noble INSTALL_SSH=true \
 docker buildx bake --file ../bake/image-builds.hcl --set '*.platform=linux/arm64' --load rstudio
 ```
 
+Published tags encode the R and Ubuntu versions, not optional build modules.
+Check the image metadata to see which optional modules were included:
+
+```sh
+docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \
+  cat /usr/local/share/rstudio-server-build/modules.json
+```
+
 ## Post-Installation Notes
 
 For image-level dependencies, prefer changing the Dockerfile or build scripts

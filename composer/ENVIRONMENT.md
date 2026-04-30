@@ -97,6 +97,7 @@ the image. Optional image features are controlled at build time through
 `bake/image-builds.hcl`:
 
 ```text
+R_BASE_MODE
 INSTALL_R_DEV_DEPS
 INSTALL_R_CMD_CHECK_DEPS
 TEX_VARIANT
@@ -104,8 +105,17 @@ INSTALL_JAVA
 INSTALL_SSH
 ```
 
+`R_BASE_MODE=base` keeps `r-base` minimal and ignores optional module args for
+that target. `R_BASE_MODE=dev` allows selected optional modules to be installed
+into `r-base`. The `rstudio` target can install selected modules on top of the
+inherited `r-base` image and skips modules already recorded in metadata.
+
 `INSTALL_R_DEV_DEPS=true` also forces Java installation during the image build,
 even when `INSTALL_JAVA=false`. Keep `INSTALL_JAVA` for images that need Java
 without the full R development dependency set.
+
+Image tags encode R and Ubuntu versions, not optional modules. Inspect
+`/usr/local/share/rstudio-server-build/modules.json` inside an image to see the
+actual optional module state.
 
 See the root `README.md` for build examples.

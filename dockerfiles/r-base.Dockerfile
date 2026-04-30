@@ -11,6 +11,11 @@ ARG TZ
 ARG CRAN
 ARG LANG
 ARG DEBIAN_FRONTEND
+ARG R_BASE_MODE
+ARG INSTALL_R_DEV_DEPS
+ARG INSTALL_R_CMD_CHECK_DEPS
+ARG TEX_VARIANT
+ARG INSTALL_JAVA
 
 # Import values of ARGs from ENVIRONMENT
 ENV R_VERSION=${R_VERSION:-latest}
@@ -44,5 +49,39 @@ if getent passwd 1000 >/dev/null; then
 fi
 /rocker_scripts/setup_R.sh
 EOF
+
+RUN case "${R_BASE_MODE:-base}" in \
+        base | dev) ;; \
+        *) echo "Invalid R_BASE_MODE=${R_BASE_MODE}. Use one of: base, dev." >&2; exit 1 ;; \
+    esac
+
+RUN BUILD_IMAGE=r-base /rocker_scripts/build_metadata.sh init r-base
+
+# Optional R ecosystem modules for CLI-first R images. These are ignored when
+# R_BASE_MODE=base, regardless of the module-specific build args.
+RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
+        BUILD_IMAGE=r-base /rocker_scripts/install_r_dev_deps.sh && \
+        /rocker_scripts/fix_r_site_library_permissions.sh; \
+    else \
+        echo "Skipping r-base optional modules because R_BASE_MODE=${R_BASE_MODE:-base}"; \
+    fi
+
+RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
+        BUILD_IMAGE=r-base /rocker_scripts/install_r_cmd_check_deps.sh; \
+    else \
+        echo "Skipping r-base R CMD check dependencies because R_BASE_MODE=${R_BASE_MODE:-base}"; \
+    fi
+
+RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
+        BUILD_IMAGE=r-base /rocker_scripts/install_texlive_variant.sh; \
+    else \
+        echo "Skipping r-base TeX installation because R_BASE_MODE=${R_BASE_MODE:-base}"; \
+    fi
+
+RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
+        BUILD_IMAGE=r-base /rocker_scripts/install_java.sh; \
+    else \
+        echo "Skipping r-base Java installation because R_BASE_MODE=${R_BASE_MODE:-base}"; \
+    fi
 
 CMD ["R"]

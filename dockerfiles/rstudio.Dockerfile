@@ -24,6 +24,8 @@ RUN find /rocker_scripts -type d -exec chmod 755 {} + && \
   find /rocker_scripts -type f -exec chmod 644 {} + && \
   find /rocker_scripts -type f \( -name "*.sh" -o -name "*.R" -o -name "*.r" \) -exec chmod 755 {} +
 
+RUN BUILD_IMAGE=rstudio /rocker_scripts/build_metadata.sh init rstudio
+
 RUN /rocker_scripts/install_rstudio.sh
 RUN /rocker_scripts/install_pandoc.sh
 RUN /rocker_scripts/install_quarto.sh
@@ -43,20 +45,20 @@ WORKDIR /home/rstudio/
 RUN /rocker_scripts/fix_r_site_library_permissions.sh
 
 # Optional R package development dependencies and preinstalled R packages.
-RUN /rocker_scripts/install_r_dev_deps.sh && \
+RUN BUILD_IMAGE=rstudio /rocker_scripts/install_r_dev_deps.sh && \
   /rocker_scripts/fix_r_site_library_permissions.sh
 
 # Optional Ubuntu packages required by R CMD check.
-RUN /rocker_scripts/install_r_cmd_check_deps.sh
+RUN BUILD_IMAGE=rstudio /rocker_scripts/install_r_cmd_check_deps.sh
 
 # Optional TeX Live installation.
-RUN /rocker_scripts/install_texlive_variant.sh
+RUN BUILD_IMAGE=rstudio /rocker_scripts/install_texlive_variant.sh
 
 # Optional Java installation and R Java configuration.
-RUN /rocker_scripts/install_java.sh
+RUN BUILD_IMAGE=rstudio /rocker_scripts/install_java.sh
 
 # Optional OpenSSH server for remote development access.
-RUN /rocker_scripts/install_ssh.sh
+RUN BUILD_IMAGE=rstudio /rocker_scripts/install_ssh.sh
 
 # Set LANG from locale.
 RUN locale-gen ${LANG}

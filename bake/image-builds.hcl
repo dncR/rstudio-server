@@ -38,6 +38,10 @@ variable "RSTUDIO_VERSION" {
   default = "2026.04.0+526"
 }
 
+variable "R_BASE_MODE" {
+  default = "base"
+}
+
 variable "INSTALL_R_DEV_DEPS" {
   default = "false"
 }
@@ -99,6 +103,11 @@ target "r-base" {
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
     "DEBIAN_FRONTEND" = "${DEBIAN_FRONTEND}"
+    "R_BASE_MODE" = "${R_BASE_MODE}"
+    "INSTALL_R_DEV_DEPS" = "${INSTALL_R_DEV_DEPS}"
+    "INSTALL_R_CMD_CHECK_DEPS" = "${INSTALL_R_CMD_CHECK_DEPS}"
+    "TEX_VARIANT" = "${TEX_VARIANT}"
+    "INSTALL_JAVA" = "${INSTALL_JAVA}"
   }
 }
 
