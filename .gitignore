@@ -44,6 +44,11 @@ vignettes/*.pdf
 # External volumes
 externalvolume/
 IgnoredFiles/
+composer/workspace/
 
 bake/template.hcl
 dockerfiles/template.Dockerfile
+
+# Local Docker Compose configuration
+composer/.env
+composer/rstudio.yml

@@ -1,104 +1,127 @@
-# Creating Docker Container for Development Environment.
+# Creating Docker Container for Development Environment
 
-We propose a docker container to be used for package development. The built VMs are distributed through Docker Hub ([dncr/rstudio-server](https://hub.docker.com/repository/docker/dncr/rstudio-server/general)) and source codes are available through GitHub ([https://github.com/dncR/rstudio-server](https://github.com/dncR/rstudio-server)). The docker container is built upon **Linux Operating System** (by default, Ubuntu Noble) with pre-installed **R** and **RStudio Server**. All the arguments to be used while *pulling*, *building*, or *creating* docker image/container are given with an environment file **.env**. One may change the value of corresponding arguments to customize Docker Environment. See below for more details on **.env** file.
+This directory contains Docker Compose templates for running the published
+`dncr/rstudio-server` images as a local RStudio Server development environment.
+The image is built from Ubuntu, R, and RStudio Server and supports both
+`linux/amd64` and `linux/arm64` through Docker's platform-aware image pull.
 
-## Working with .env file
+## Configuration Files
 
-This file includes argument used to customize Docker images and/or containers. The container comes with **Ubuntu Noble** distribution by default, supporting for both platforms **ARM (e.g., Apple's silicon chips)** and **AMD (e.g., Intel-based chips)**. It is not required to set OS platform. Docker will pull appropriate platform from the repository.
+Local runtime configuration is intentionally separated from publishable examples:
 
-* **UBUNTU_VERSION**: The codename of Ubuntu distro. Default is `noble`.
-* **R_VERSION**: The version of base R installation. Default is `latest`.
-* **RSTUDIO_VERSION**: The version of RStudio Server installation. Default is `2026.04.0+526`. This option does not have an effect while running pre-built containers. It is used while creating the Docker image from scratch.
+- `.env_example`: version-controlled example environment file.
+- `rstudio_example.yml`: version-controlled example Compose file.
+- `.env`: local environment file, ignored by git.
+- `rstudio.yml`: local Compose file, ignored by git.
 
-For other arguments, see **.env** file.
-
-## Running the Docker Container
-
-This workflow uses pre-built images published on Docker Hub.
-If you want to rebuild images locally (instead of pulling pre-built tags), see the root build guide in `../README.md` and the canonical bake workflow at `../bake/image-builds.hcl`.
-
-One may run the Docker Container using the commands below:
-
-1. Pull pre-built image (including R 4.4.1 installed) from Docker Hub.
-
-```
-R_VERSION=4.4.1 docker compose -f rstudio.yml pull
-```
-
-2. Run container from the pulled image.
-
-```
-R_VERSION=4.4.1 docker compose -f rstudio.yml up -d
-```
-
-One may change the **rstudio.yml** file to customize the docker container, e.g., binding volumes, adding services, changing the localhost ports, etc. See Docker Compose file documentation for more details on how to edit YAML file to customize Docker Containers.
-
-## SSH Key Setup for Container Access
-
-The `rstudio.yml` file mounts a host public key into the container as:
-
-```yml
-~/.ssh/id_ed25519.pub:/home/rstudio/.ssh/authorized_keys:ro
-```
-
-Before running compose, ensure the public key file exists on the host and matches the mounted path.
-
-1. Check existing SSH public keys:
+Create local files from the examples before running Compose:
 
 ```sh
-ls -la ~/.ssh/*.pub
+cd composer
+cp .env_example .env
+cp rstudio_example.yml rstudio.yml
 ```
 
-2. If no suitable key exists, create one (example: Ed25519):
+Then edit `.env` for your machine. At minimum, change:
+
+- `PASSWORD`: password used to log in to RStudio Server.
+- `SSH_PUBLIC_KEY`: absolute path to an existing host public key.
+- `WORKDIR`: host directory mounted into the container workspace.
+
+## Environment Variables
+
+The Compose file pulls this image tag:
+
+```text
+dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}
+```
+
+Important variables in `.env`:
+
+- `R_VERSION`: R version tag component, for example `latest` or `4.6.0`.
+- `UBUNTU_VERSION`: Ubuntu codename tag component, for example `noble`.
+- `BIND_ADDRESS`: host interface to bind; keep `127.0.0.1` for local-only access.
+- `PORT`: host port mapped to RStudio Server port `8787`.
+- `SSH_PORT`: host port mapped to SSH port `22`.
+- `DEFAULT_USER`: runtime user configured inside the container.
+- `PASSWORD`: RStudio login password.
+- `ROOT`: set to `true` only if the runtime user needs passwordless sudo.
+- `WORKDIR`: host directory mounted at `${CONTAINER_HOME}/work`.
+- `SSH_PUBLIC_KEY`: host public key mounted as `authorized_keys` for SSH access.
+
+Do not use `USER` or `HOME` for Compose interpolation in this file. Those names
+are commonly exported by the host shell, and shell variables take precedence over
+values from `.env`. Use `DEFAULT_USER` and `CONTAINER_HOME` instead.
+
+## Running the Container
+
+Pull the configured image:
+
+```sh
+docker compose --env-file .env -f rstudio.yml pull
+```
+
+Start the container:
+
+```sh
+docker compose --env-file .env -f rstudio.yml up -d
+```
+
+Open RStudio Server at:
+
+```text
+http://127.0.0.1:${PORT}
+```
+
+Log in with the user from `DEFAULT_USER` and the password from `PASSWORD`.
+
+Stop the container:
+
+```sh
+docker compose --env-file .env -f rstudio.yml down
+```
+
+## SSH Access
+
+The example Compose file maps the host public key specified by
+`SSH_PUBLIC_KEY` to:
+
+```text
+${CONTAINER_HOME}/.ssh/authorized_keys
+```
+
+Before starting the container, make sure the public key exists:
+
+```sh
+ls -la /absolute/path/to/id_ed25519.pub
+```
+
+If you need a new Ed25519 key:
 
 ```sh
 ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
 
-This creates a private key and a public key (default: `~/.ssh/id_ed25519` and `~/.ssh/id_ed25519.pub`).
+Then update `SSH_PUBLIC_KEY` in `.env`.
 
-3. Update `rstudio.yml` volume mapping to the correct public key path.
+## Local Builds
 
-Examples:
+This Compose workflow is for running pre-built images from Docker Hub. If you
+want to rebuild images locally, use the canonical bake workflow in the root
+README and `../bake/image-builds.hcl`.
 
-```yml
-# Default Ed25519 key
-- ~/.ssh/id_ed25519.pub:/home/rstudio/.ssh/authorized_keys:ro
+## Post-Installation Notes
 
-# Custom key location
-- /absolute/path/to/your_key.pub:/home/rstudio/.ssh/authorized_keys:ro
-```
+For image-level dependencies, prefer changing the Dockerfile or build scripts
+and rebuilding the image. For one-off runtime changes, set `ROOT=true` in
+`.env`, restart the container, and use `sudo` inside the RStudio session.
 
-4. Start the container after confirming the key path:
-
-```sh
-R_VERSION=4.4.1 docker compose -f rstudio.yml up -d
-```
-
-We benefitted from the installation scripts of [Rocker Project](https://hub.docker.com/u/rocker) and modified some scripts to create our custom docker image. Rocker Project is available as a GitHub repository [here](https://github.com/rocker-org/rocker-versioned2).
-
-## Post Installation Steps
-
-### 1. Linux Dependencies (Ubuntu Noble)
-
-Below linux packages are required to be installed after Docker Container is created.
-
-```sh
-sudo apt-get update
-sudo apt-get install -y \
-  libmagick++-dev
-```
-	
-### 2. TexLive Installation (Optional)
-
-We included all the scripts used (or not used) while creating the docker image under in-container folder `/rocker_scripts`. Two scripts, called `texlive_base.sh` and `texlive-full.sh`, are available in this folder.
-
-If TeX was already installed during image build (for example with `INSTALL_TEX=true`), do not run post-install TeX setup again.
-First, run the container and check whether TeX is already available:
+If TeX was installed during image build with `INSTALL_TEX=true`, do not run
+post-install TeX setup again. Check availability first:
 
 ```sh
 pdflatex --version
 ```
 
-If this command works, skip this step to avoid duplicate installation and extra build time.
-Only run `texlive_base.sh` or `texlive-full.sh` when TeX is not present in the running image.
+The installation scripts are adapted from the
+[Rocker Project](https://github.com/rocker-org/rocker-versioned2).
