@@ -44,7 +44,6 @@ vignettes/*.pdf
 # External volumes
 externalvolume/
 IgnoredFiles/
-scripts-rocker-versioned2/
 
 bake/template.hcl
 dockerfiles/template.Dockerfile

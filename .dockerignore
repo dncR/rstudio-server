@@ -1,0 +1,39 @@
+# Git metadata
+.git
+.gitignore
+
+# Local/private files
+IgnoredFiles/
+externalvolume/
+.env
+.Renviron
+.httr-oauth
+
+# R session and build artifacts
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+*-Ex.R
+*.tar.gz
+*.Rcheck/
+*_cache/
+cache/
+*.utf8.md
+*.knit.md
+vignettes/*.html
+vignettes/*.pdf
+
+# RStudio and editor metadata
+.Rproj.user/
+*.code-workspace
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local templates and scratch files
+bake/template.hcl
+dockerfiles/template.Dockerfile
