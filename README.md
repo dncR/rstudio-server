@@ -153,9 +153,12 @@ docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \
   cat /usr/local/share/rstudio-server-build/modules.json
 ```
 
-The same metadata path is available in `dncr/r-base` images. The JSON records
-the build user, RStudio version, requested TeX variant, and installed optional
-modules.
+The same metadata path is available in `dncr/r-base` images. Fields that do not
+apply to the image being built are stored as JSON `null`; for example,
+`default_user` and `rstudio_version` are `null` in `r-base` metadata and are
+written with real values when the `rstudio` image updates the metadata. The
+`requested` section records build requests, while `modules` records what is
+actually installed in the image.
 
 ### Step 6.2 (Optional): Use a `.env` file instead of typing variables every time
 

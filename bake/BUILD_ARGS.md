@@ -94,6 +94,12 @@ Optional module state is recorded at:
 /usr/local/share/rstudio-server-build/modules.json
 ```
 
+Fields that are not defined for the image being built are stored as JSON `null`.
+For example, `default_user` and `rstudio_version` are `null` in `r-base`
+metadata, then the `rstudio` build rewrites them with the actual build values.
+The `requested` section records build-time requests, while `modules` records the
+modules actually installed in the image.
+
 Example:
 
 ```json

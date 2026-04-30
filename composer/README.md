@@ -137,7 +137,9 @@ docker buildx bake --file ../bake/image-builds.hcl --set '*.platform=linux/arm64
 
 Published tags encode the R and Ubuntu versions, not optional build modules.
 Check the image metadata to see which optional modules, build user, RStudio
-version, and requested TeX variant were included:
+version, and requested TeX variant were included. Image-specific fields that do
+not apply are stored as JSON `null`; `requested` records build requests and
+`modules` records what is actually installed:
 
 ```sh
 docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \

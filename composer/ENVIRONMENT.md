@@ -127,6 +127,8 @@ without the full R development dependency set.
 Image tags encode R and Ubuntu versions, not optional modules. Inspect
 `/usr/local/share/rstudio-server-build/modules.json` inside an image to see the
 actual optional module state, build user, RStudio version, and requested TeX
-variant.
+variant. Image-specific fields that do not apply are stored as JSON `null`;
+`requested` records build requests and `modules` records what is actually
+installed.
 
 See the root `README.md` for build examples.

@@ -16,9 +16,21 @@ metadata_bool() {
     esac
 }
 
+metadata_json_string_or_null() {
+    local value="$1"
+
+    if [ -z "$value" ] || [ "$value" = "null" ]; then
+        echo "null"
+        return
+    fi
+
+    value=$(printf '%s' "$value" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    printf '"%s"\n' "$value"
+}
+
 metadata_string() {
     if [ -f "$BUILD_METADATA_FILE" ]; then
-        grep -E "\"$1\"[[:space:]]*:" "$BUILD_METADATA_FILE" | head -n 1 | sed -E 's/^[^:]+:[[:space:]]*"([^"]*)".*$/\1/' || true
+        grep -E "\"$1\"[[:space:]]*:" "$BUILD_METADATA_FILE" | head -n 1 | sed -nE 's/^[^:]+:[[:space:]]*"([^"]*)".*$/\1/p' || true
     fi
 }
 
@@ -51,30 +63,47 @@ metadata_write() {
     local default_user
     local rstudio_version
     local tex_variant_requested
+    local r_version_json
+    local ubuntu_version_json
+    local default_user_json
+    local rstudio_version_json
+    local r_base_mode_json
+    local tex_variant_requested_json
 
     r_version=${R_VERSION:-$(metadata_string "r_version")}
     ubuntu_version=${UBUNTU_VERSION:-$(metadata_string "ubuntu_version")}
-    default_user=${DEFAULT_USER:-$(metadata_string "default_user")}
-    rstudio_version=${RSTUDIO_VERSION:-$(metadata_string "rstudio_version")}
     tex_variant_requested=${TEX_VARIANT:-$(metadata_string "tex_variant")}
-    [ -n "$r_version" ] || r_version="unknown"
-    [ -n "$ubuntu_version" ] || ubuntu_version="unknown"
-    [ -n "$default_user" ] || default_user="unknown"
-    [ -n "$rstudio_version" ] || rstudio_version="unknown"
-    [ -n "$tex_variant_requested" ] || tex_variant_requested="none"
+
+    case "$image" in
+        rstudio)
+            default_user=${DEFAULT_USER:-$(metadata_string "default_user")}
+            rstudio_version=${RSTUDIO_VERSION:-$(metadata_string "rstudio_version")}
+            ;;
+        *)
+            default_user=""
+            rstudio_version=""
+            ;;
+    esac
+
+    r_version_json=$(metadata_json_string_or_null "$r_version")
+    ubuntu_version_json=$(metadata_json_string_or_null "$ubuntu_version")
+    default_user_json=$(metadata_json_string_or_null "$default_user")
+    rstudio_version_json=$(metadata_json_string_or_null "$rstudio_version")
+    r_base_mode_json=$(metadata_json_string_or_null "$r_base_mode")
+    tex_variant_requested_json=$(metadata_json_string_or_null "$tex_variant_requested")
 
     mkdir -p "$BUILD_METADATA_DIR"
     cat > "$BUILD_METADATA_FILE" <<EOF
 {
   "schema_version": 2,
   "image": "$image",
-  "r_version": "$r_version",
-  "ubuntu_version": "$ubuntu_version",
-  "default_user": "$default_user",
-  "rstudio_version": "$rstudio_version",
-  "r_base_mode": "$r_base_mode",
+  "r_version": $r_version_json,
+  "ubuntu_version": $ubuntu_version_json,
+  "default_user": $default_user_json,
+  "rstudio_version": $rstudio_version_json,
+  "r_base_mode": $r_base_mode_json,
   "requested": {
-    "tex_variant": "$tex_variant_requested"
+    "tex_variant": $tex_variant_requested_json
   },
   "modules": {
     "r_dev_deps": $r_dev_deps,
@@ -106,6 +135,17 @@ metadata_init() {
     if [ -z "$current_mode" ]; then
         current_mode=${R_BASE_MODE:-base}
     fi
+
+    case "$image" in
+        r-base)
+            current_ssh="null"
+            ;;
+        rstudio)
+            if [ "$current_ssh" = "null" ]; then
+                current_ssh="false"
+            fi
+            ;;
+    esac
 
     metadata_write "$image" "$current_mode" "$current_r_dev" "$current_r_cmd" "$current_tex" "$current_java" "$current_ssh"
 }
