@@ -23,6 +23,10 @@ services:
     environment:
       # - USER=rstudio  # by default, the username is set "rstudio"
       - PASSWORD=${RSTUDIO_PASSWORD:?Set RSTUDIO_PASSWORD in your shell before running docker compose}
+      # Set RSTUDIO_ROOT=true in your shell to grant the runtime user
+      # passwordless sudo at container startup via scripts/init_userconf.sh.
+      # The default keeps sudo access disabled unless explicitly requested.
+      - ROOT=${RSTUDIO_ROOT:-false}
     # Set restart policy for the container.
     restart: "unless-stopped"
     # This compose profile runs as root for admin/package-install workflows.

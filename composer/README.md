@@ -1,21 +1,21 @@
 # Creating Docker Container for Development Environment.
 
-We propose a docker container to be used for package development. The built VMs are distributed through Docker Hub ([dncr/rstudio-server](https://hub.docker.com/repository/docker/dncr/rstudio-server/general)) and source codes are available through GitHub ([https://github.com/dncR/rstudio-server](https://github.com/dncR/rstudio-server)). The docker container is built upon **Linux Operating System** (particularly, Ubuntu Jammy) with pre-installed **R** and **RStudio Server**. All the arguments to be used while *pulling*, *building*, or *creating* docker image/container are given with an environment file **.env**. One may change the value of corresponding arguments to customize Docker Environment. See below for more details on **.env** file.
+We propose a docker container to be used for package development. The built VMs are distributed through Docker Hub ([dncr/rstudio-server](https://hub.docker.com/repository/docker/dncr/rstudio-server/general)) and source codes are available through GitHub ([https://github.com/dncR/rstudio-server](https://github.com/dncR/rstudio-server)). The docker container is built upon **Linux Operating System** (by default, Ubuntu Noble) with pre-installed **R** and **RStudio Server**. All the arguments to be used while *pulling*, *building*, or *creating* docker image/container are given with an environment file **.env**. One may change the value of corresponding arguments to customize Docker Environment. See below for more details on **.env** file.
 
 ## Working with .env file
 
-This file includes argument used to customize Docker images and/or containers. The container comes with **Ubuntu Jammy** distribution, supporting for both platforms **ARM (e.g., Apple's silicon chips)** and **AMD (e.g., Intel-based chips)**. It is not required to set OS platform. Docker will pull appropriate platform from the repository.
+This file includes argument used to customize Docker images and/or containers. The container comes with **Ubuntu Noble** distribution by default, supporting for both platforms **ARM (e.g., Apple's silicon chips)** and **AMD (e.g., Intel-based chips)**. It is not required to set OS platform. Docker will pull appropriate platform from the repository.
 
-* **UBUNTU_VERSION**: The codename of Ubuntu distro. Default is `jammy`.
+* **UBUNTU_VERSION**: The codename of Ubuntu distro. Default is `noble`.
 * **R_VERSION**: The version of base R installation. Default is `latest`.
-* **RSTUDIO_VERSION**: The version of RStudio Server installation. Default is `2023.12.0+369`. This option does not have an effect while running pre-built containers. It is used while creating the Docker image from sctracth.
+* **RSTUDIO_VERSION**: The version of RStudio Server installation. Default is `2026.04.0+526`. This option does not have an effect while running pre-built containers. It is used while creating the Docker image from scratch.
 
 For other arguments, see **.env** file.
 
 ## Running the Docker Container
 
 This workflow uses pre-built images published on Docker Hub.
-If you want to rebuild images locally (instead of pulling pre-built tags), see the root build guide in `../README.md` and the bake definitions under `../bake/*.hcl`.
+If you want to rebuild images locally (instead of pulling pre-built tags), see the root build guide in `../README.md` and the canonical bake workflow at `../bake/image-builds.hcl`.
 
 One may run the Docker Container using the commands below:
 
@@ -79,7 +79,7 @@ We benefitted from the installation scripts of [Rocker Project](https://hub.dock
 
 ## Post Installation Steps
 
-### 1. Linux Dependencies (Ubuntu 22.04 - Jammy)
+### 1. Linux Dependencies (Ubuntu Noble)
 
 Below linux packages are required to be installed after Docker Container is created.
 

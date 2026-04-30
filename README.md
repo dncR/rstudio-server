@@ -91,21 +91,28 @@ Build docker images by passing variables inline:
 # Load into local image library. 
 # (Use --push to push created image directly to the Docker Hub repository. Login required.)
 
-# docker buildx bake --file <path_to_bake_file> --builder multiarch --load
-R_VERSION=latest UBUNTU_VERSION=noble docker buildx bake --file bake/r-base.hcl --builder multiarch --load
+# docker buildx bake --file bake/image-builds.hcl --builder multiarch --load <target>
+R_VERSION=latest UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds.hcl --builder multiarch --load r-base
 ```
 
 Change environment variables and build images:
 
 ```sh
 # Build a specific R version
-R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/r-base.hcl --builder multiarch --load
+R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds.hcl --builder multiarch --load r-base
 
 # Build RStudio image with extra bake args
-R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 PREINSTALL_R_PKG=true INSTALL_TEX=false docker buildx bake --file bake/rstudio.hcl --builder multiarch --load
+R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 PREINSTALL_R_PKG=true INSTALL_TEX=false docker buildx bake --file bake/image-builds.hcl --builder multiarch --load
 ```
 
-For `bake/rstudio.hcl`, the extra args below control optional image customizations:
+Use `bake/image-builds.hcl` as the canonical build workflow. Its default group
+builds `r-base` and `rstudio` together, and the RStudio target is wired to the
+local `r-base` target, so the build does not depend on an already-published
+`dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}` image. For a base-only build, pass
+the `r-base` target explicitly. For an RStudio build, run the default workflow
+or pass the `rstudio` target.
+
+For `bake/image-builds.hcl`, the extra args below control optional image customizations:
 
 - `INSTALL_TEX=true`: installs the full TeX Live distribution from Ubuntu's `apt` repository using `scripts/texlive_full.sh`.
 - `PREINSTALL_R_PKG=true`: installs pre-defined R packages from `scripts/preinstall_r_packages.sh` while building the image.
@@ -129,7 +136,7 @@ set -a
 source .env
 set +a
 
-docker buildx bake --file bake/r-base.hcl --builder multiarch --load
+docker buildx bake --file bake/image-builds.hcl --builder multiarch --load
 ```
 
 This is optional and useful when you build frequently with the same variable set.
