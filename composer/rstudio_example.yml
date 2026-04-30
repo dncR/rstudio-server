@@ -4,10 +4,8 @@ services:
   rstudio-server:
     image: dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}
     container_name: ${CONTAINER_NAME}
-    env_file:
-      - .env
     environment:
-      DEFAULT_USER: ${DEFAULT_USER}
+      DEFAULT_USER: ${DEFAULT_USER:-rstudio}
       PASSWORD: ${PASSWORD:?Set PASSWORD in composer/.env before running docker compose}
       ROOT: ${ROOT:-false}
       USERID: ${USERID:-1000}
@@ -20,10 +18,10 @@ services:
     volumes:
       - type: bind
         source: ${WORKDIR:-./workspace}
-        target: ${CONTAINER_HOME:-/home/rstudio}/externalvolume
+        target: /home/${DEFAULT_USER:-rstudio}/externalvolume
       - type: bind
         source: ${SSH_PUBLIC_KEY}
-        target: ${CONTAINER_HOME:-/home/rstudio}/.ssh/authorized_keys
+        target: /home/${DEFAULT_USER:-rstudio}/.ssh/authorized_keys
         read_only: true
         bind:
           create_host_path: false

@@ -24,6 +24,7 @@ docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-bas
 | `CRAN` | `https://p3m.dev/cran/__linux__/${UBUNTU_VERSION}/latest` | `r-base` | CRAN-compatible repository URL | Default CRAN mirror written into R configuration. |
 | `DEBIAN_FRONTEND` | `noninteractive` | `r-base` | Usually `noninteractive` | Debian frontend used during apt-based image builds. |
 | `RSTUDIO_VERSION` | `2026.04.0+526` | `rstudio` | `stable`, `preview`, `daily`, `latest`, or a Posit/RStudio Server version | RStudio Server version installed by `scripts/install_rstudio.sh`. |
+| `DEFAULT_USER` | `rstudio` | `rstudio` | Linux username | Linux user created by `scripts/default_user.sh` for RStudio login and home-directory setup. Keep Compose `DEFAULT_USER` aligned with this value for custom images. |
 
 ## Optional Module Arguments
 
@@ -36,7 +37,7 @@ see which modules were installed.
 | `R_BASE_MODE` | `base` | `r-base` | `base`, `dev` | Controls whether optional modules are allowed in `r-base`. `base` ignores optional module args for `r-base`; `dev` allows selected modules to install. |
 | `INSTALL_R_DEV_DEPS` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs R package development system dependencies and preinstalls `devtools` and `BiocManager`. Also forces Java installation during the same image build. |
 | `INSTALL_R_CMD_CHECK_DEPS` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs `qpdf` and `ghostscript-x` for `R CMD check`, `devtools::check()`, and `rcmdcheck` workflows. |
-| `TEX_VARIANT` | `none` | `r-base`, `rstudio` | `none`, `base`, `full` | Controls TeX Live installation. `none` skips TeX, `base` installs a smaller TeX set, and `full` installs Ubuntu's `texlive-full`. |
+| `TEX_VARIANT` | `none` | `r-base`, `rstudio` | `none`, `base`, `extra`, `full` | Controls TeX Live installation. `none` skips TeX, `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs Ubuntu's `texlive-full`. |
 | `INSTALL_JAVA` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs Java and runs `R CMD javareconf -e`. This is forced to `true` when `INSTALL_R_DEV_DEPS=true`. |
 | `INSTALL_SSH` | `false` | `rstudio` | `true`, `false` | Installs and configures OpenSSH Server under s6 supervision. This is only applied to the `rstudio` image. |
 
@@ -77,8 +78,8 @@ docker buildx bake --file bake/image-builds.hcl rstudio --push
 ```
 
 If `r-base` already installed a module, the `rstudio` scripts read
-`modules.json` and skip duplicate installation. For TeX, `full` satisfies a
-later `base` request, while `base` can be upgraded to `full`.
+`modules.json` and skip duplicate installation. For TeX, `full` satisfies later
+`base` and `extra` requests, while `base` can be upgraded to `extra` or `full`.
 
 ## Metadata
 

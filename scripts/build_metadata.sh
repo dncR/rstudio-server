@@ -145,7 +145,8 @@ metadata_tex_satisfies() {
 
     case "$requested:$installed" in
         none:*) return 0 ;;
-        base:base | base:full) return 0 ;;
+        base:base | base:extra | base:full) return 0 ;;
+        extra:extra | extra:full) return 0 ;;
         full:full) return 0 ;;
         *) return 1 ;;
     esac

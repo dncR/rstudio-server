@@ -45,15 +45,15 @@ Important variables in `.env`:
 - `BIND_ADDRESS`: host interface to bind; keep `127.0.0.1` for local-only access.
 - `PORT`: host port mapped to RStudio Server port `8787`.
 - `SSH_PORT`: host port mapped to SSH port `22`.
-- `DEFAULT_USER`: runtime user configured inside the container.
+- `DEFAULT_USER`: RStudio login user. The default published images use `rstudio`.
 - `PASSWORD`: RStudio login password.
 - `ROOT`: set to `true` only if the runtime user needs passwordless sudo.
-- `WORKDIR`: host directory mounted at `${CONTAINER_HOME}/externalvolume`.
+- `WORKDIR`: host directory mounted at `/home/${DEFAULT_USER}/externalvolume`.
 - `SSH_PUBLIC_KEY`: host public key mounted as `authorized_keys` for SSH access.
 
 Do not use `USER` or `HOME` for Compose interpolation in this file. Those names
-are commonly exported by the host shell, and shell variables take precedence over
-values from `.env`. Use `DEFAULT_USER` and `CONTAINER_HOME` instead.
+are commonly exported by the host shell and can override `.env` values during
+Compose interpolation. Use `DEFAULT_USER` for the RStudio login user.
 
 ## Running the Container
 
@@ -75,7 +75,7 @@ Open RStudio Server at:
 http://127.0.0.1:${PORT}
 ```
 
-Log in with the user from `DEFAULT_USER` and the password from `PASSWORD`.
+Log in with the username from `DEFAULT_USER` and the password from `PASSWORD`.
 
 Stop the container:
 
@@ -93,7 +93,7 @@ The example Compose file maps the host public key specified by
 `SSH_PUBLIC_KEY` to:
 
 ```text
-${CONTAINER_HOME}/.ssh/authorized_keys
+/home/${DEFAULT_USER}/.ssh/authorized_keys
 ```
 
 Before starting the container, make sure the public key exists:
@@ -137,9 +137,9 @@ For image-level dependencies, prefer changing the Dockerfile or build scripts
 and rebuilding the image. For one-off runtime changes, set `ROOT=true` in
 `.env`, restart the container, and use `sudo` inside the RStudio session.
 
-If TeX was installed during image build with `TEX_VARIANT=base` or
-`TEX_VARIANT=full`, do not run post-install TeX setup again. Check availability
-first:
+If TeX was installed during image build with `TEX_VARIANT=base`,
+`TEX_VARIANT=extra`, or `TEX_VARIANT=full`, do not run post-install TeX setup
+again. Check availability first:
 
 ```sh
 pdflatex --version

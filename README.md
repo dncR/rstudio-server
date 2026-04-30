@@ -118,19 +118,25 @@ or pass the `rstudio` target.
 
 For `bake/image-builds.hcl`, the extra args below control optional image customizations:
 
+- `DEFAULT_USER=rstudio`: sets the Linux user created for the `rstudio` image. The default is defined as an image environment variable during build.
 - `R_BASE_MODE=base|dev`: controls whether optional modules are allowed in the `r-base` target. The default `base` ignores optional module args for `r-base`; `dev` enables the selected optional modules in `r-base`.
 - `INSTALL_R_DEV_DEPS=true`: installs R package development system dependencies and preinstalls `devtools` and `BiocManager` using `scripts/install_r_dev_deps.sh`. This also forces Java installation, even when `INSTALL_JAVA=false`.
 - `INSTALL_R_CMD_CHECK_DEPS=true`: installs `qpdf` and `ghostscript-x` for `R CMD check` workflows using `scripts/install_r_cmd_check_deps.sh`.
-- `TEX_VARIANT=none|base|full`: controls TeX Live installation using `scripts/install_texlive_variant.sh`. The default is `none`; `base` installs a smaller TeX set, and `full` installs the full Ubuntu TeX Live distribution.
+- `TEX_VARIANT=none|base|extra|full`: controls TeX Live installation using `scripts/install_texlive_variant.sh`. The default is `none`; `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs the full Ubuntu TeX Live distribution.
 - `INSTALL_JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
 - `INSTALL_SSH=true`: installs and configures OpenSSH Server under s6 supervision using `scripts/install_ssh.sh`.
 
 See `bake/BUILD_ARGS.md` for the complete build argument reference.
 
-All optional build args default to `false` or `none`. With `R_BASE_MODE=base`,
+Boolean optional build args default to `false`, and `TEX_VARIANT` defaults to
+`none`. With `R_BASE_MODE=base`,
 the `r-base` image keeps only the base R environment even if optional module
 args are set. The `rstudio` image can still install selected optional modules
 on top of the inherited `r-base` image.
+
+The RStudio Server image uses `DEFAULT_USER=rstudio` by default. If you build an
+image with a different `DEFAULT_USER`, use the same value in Compose so runtime
+paths, SSH keys, and login credentials target the correct user home.
 
 Image tags encode the R and Ubuntu versions, not the optional build modules.
 Rebuilding the same tag with different build arguments can produce images with
@@ -178,6 +184,8 @@ their respective `experimental` directories:
 - `bake/experimental/shiny-server-AMD64.hcl`
 - `bake/experimental/shiny-server-ARM64.hcl`
 - `composer/experimental/shiny.yml`
+- `scripts/experimental/docker.sh`
+- `scripts/experimental/InstalleR-mlseq.R`
 - `scripts/experimental/install_shiny_server.sh`
 
 Treat these files as experimental until the Shiny Server package source and

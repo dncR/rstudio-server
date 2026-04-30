@@ -1,3 +1,4 @@
+# Experimental helper script. Not used by the image build workflow.
 # INSTALL DOCKER ENGINE
 # 1. Update the apt package index and install packages to allow apt to use a repository over HTTPS:
 apt-get update
@@ -37,4 +38,3 @@ curl -SL https://github.com/docker/compose/releases/download/v2.17.2/docker-comp
 # 2. Apply executable permissions to the standalone binary in the target path for the installation.
 chmod +x /usr/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
-

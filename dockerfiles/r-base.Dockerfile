@@ -60,6 +60,12 @@ RUN BUILD_IMAGE=r-base /rocker_scripts/build_metadata.sh init r-base
 # Optional R ecosystem modules for CLI-first R images. These are ignored when
 # R_BASE_MODE=base, regardless of the module-specific build args.
 RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
+        BUILD_IMAGE=r-base /rocker_scripts/install_java.sh; \
+    else \
+        echo "Skipping r-base Java installation because R_BASE_MODE=${R_BASE_MODE:-base}"; \
+    fi
+
+RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
         BUILD_IMAGE=r-base /rocker_scripts/install_r_dev_deps.sh && \
         /rocker_scripts/fix_r_site_library_permissions.sh; \
     else \
@@ -76,12 +82,6 @@ RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
         BUILD_IMAGE=r-base /rocker_scripts/install_texlive_variant.sh; \
     else \
         echo "Skipping r-base TeX installation because R_BASE_MODE=${R_BASE_MODE:-base}"; \
-    fi
-
-RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
-        BUILD_IMAGE=r-base /rocker_scripts/install_java.sh; \
-    else \
-        echo "Skipping r-base Java installation because R_BASE_MODE=${R_BASE_MODE:-base}"; \
     fi
 
 CMD ["R"]

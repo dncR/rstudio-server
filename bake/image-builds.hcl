@@ -38,6 +38,10 @@ variable "RSTUDIO_VERSION" {
   default = "2026.04.0+526"
 }
 
+variable "DEFAULT_USER" {
+  default = "rstudio"
+}
+
 variable "R_BASE_MODE" {
   default = "base"
 }
@@ -154,6 +158,7 @@ target "rstudio" {
   args = {
     "R_VERSION" = "${R_VERSION}"
     "RSTUDIO_VERSION" = "${RSTUDIO_VERSION}"
+    "DEFAULT_USER" = "${DEFAULT_USER}"
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "INSTALL_R_DEV_DEPS" = "${INSTALL_R_DEV_DEPS}"

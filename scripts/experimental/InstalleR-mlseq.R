@@ -1,3 +1,4 @@
+# Experimental package installation helper. Not used by the image build workflow.
 # Install R packages
 install.packages(c("dplyr", "ggplot2", "caret", "pamr", "xtable", "e1071", "kernlab"))
 

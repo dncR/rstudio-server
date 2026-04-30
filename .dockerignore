@@ -6,6 +6,8 @@
 IgnoredFiles/
 externalvolume/
 .env
+composer/.env
+composer/rstudio.yml
 .Renviron
 .httr-oauth
 

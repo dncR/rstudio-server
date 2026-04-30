@@ -52,14 +52,13 @@ when the image was built with `INSTALL_SSH=true`.
 
 ## Runtime User
 
-`DEFAULT_USER` is the Linux user configured by the container startup scripts and
-used for RStudio login.
+`DEFAULT_USER` is the RStudio login user. Published images use `rstudio` by
+default. If you build a custom image with a different `DEFAULT_USER`, set the
+same value in `.env` so Compose volume targets and runtime configuration match
+the image.
 
-Do not use `USER` for this purpose. Host shells commonly export `USER`, and
-shell variables take precedence over `.env` values during Compose interpolation.
-
-`CONTAINER_HOME` is the home directory for `DEFAULT_USER` inside the container.
-Do not use `HOME` for this purpose for the same interpolation reason.
+Do not use `USER` or `HOME` for Compose interpolation. Host shells commonly
+export those names, and shell variables take precedence over `.env` values.
 
 `USERID` and `GROUPID` let the container runtime user match a host UID/GID when
 needed for mounted volume ownership.
@@ -77,11 +76,11 @@ local, isolated environments.
 ## Volumes
 
 `WORKDIR` is the host directory mounted into the container at
-`${CONTAINER_HOME}/externalvolume`. Relative paths are resolved by Docker
+`/home/${DEFAULT_USER}/externalvolume`. Relative paths are resolved by Docker
 Compose relative to the compose file location.
 
 `SSH_PUBLIC_KEY` must point to an existing public key file on the host. It is
-mounted read-only as `${CONTAINER_HOME}/.ssh/authorized_keys`. SSH access also
+mounted read-only as `/home/${DEFAULT_USER}/.ssh/authorized_keys`. SSH access also
 requires an image built with `INSTALL_SSH=true`.
 
 ## Restart Policy
@@ -113,6 +112,9 @@ inherited `r-base` image and skips modules already recorded in metadata.
 `INSTALL_R_DEV_DEPS=true` also forces Java installation during the image build,
 even when `INSTALL_JAVA=false`. Keep `INSTALL_JAVA` for images that need Java
 without the full R development dependency set.
+
+`TEX_VARIANT` accepts `none`, `base`, `extra`, or `full`; the default is
+`none`.
 
 Image tags encode R and Ubuntu versions, not optional modules. Inspect
 `/usr/local/share/rstudio-server-build/modules.json` inside an image to see the
