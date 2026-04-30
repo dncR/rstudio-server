@@ -125,6 +125,8 @@ For `bake/image-builds.hcl`, the extra args below control optional image customi
 - `INSTALL_JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
 - `INSTALL_SSH=true`: installs and configures OpenSSH Server under s6 supervision using `scripts/install_ssh.sh`.
 
+See `bake/BUILD_ARGS.md` for the complete build argument reference.
+
 All optional build args default to `false` or `none`. With `R_BASE_MODE=base`,
 the `r-base` image keeps only the base R environment even if optional module
 args are set. The `rstudio` image can still install selected optional modules
