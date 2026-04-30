@@ -38,11 +38,23 @@ variable "RSTUDIO_VERSION" {
   default = "2026.04.0+526"
 }
 
-variable "PREINSTALL_R_PKG" {
+variable "INSTALL_R_DEV_DEPS" {
   default = "false"
 }
 
-variable "INSTALL_TEX" {
+variable "INSTALL_R_CMD_CHECK_DEPS" {
+  default = "false"
+}
+
+variable "TEX_VARIANT" {
+  default = "none"
+}
+
+variable "INSTALL_JAVA" {
+  default = "false"
+}
+
+variable "INSTALL_SSH" {
   default = "false"
 }
 
@@ -135,7 +147,10 @@ target "rstudio" {
     "RSTUDIO_VERSION" = "${RSTUDIO_VERSION}"
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
-    "PREINSTALL_R_PKG" = "${PREINSTALL_R_PKG}"
-    "INSTALL_TEX" = "${INSTALL_TEX}"
+    "INSTALL_R_DEV_DEPS" = "${INSTALL_R_DEV_DEPS}"
+    "INSTALL_R_CMD_CHECK_DEPS" = "${INSTALL_R_CMD_CHECK_DEPS}"
+    "TEX_VARIANT" = "${TEX_VARIANT}"
+    "INSTALL_JAVA" = "${INSTALL_JAVA}"
+    "INSTALL_SSH" = "${INSTALL_SSH}"
   }
 }

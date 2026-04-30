@@ -14,6 +14,8 @@ Local runtime configuration is intentionally separated from publishable examples
 - `.env`: local environment file, ignored by git.
 - `rstudio.yml`: local Compose file, ignored by git.
 
+See `ENVIRONMENT.md` for the full `.env_example` reference.
+
 Create local files from the examples before running Compose:
 
 ```sh
@@ -46,7 +48,7 @@ Important variables in `.env`:
 - `DEFAULT_USER`: runtime user configured inside the container.
 - `PASSWORD`: RStudio login password.
 - `ROOT`: set to `true` only if the runtime user needs passwordless sudo.
-- `WORKDIR`: host directory mounted at `${CONTAINER_HOME}/work`.
+- `WORKDIR`: host directory mounted at `${CONTAINER_HOME}/externalvolume`.
 - `SSH_PUBLIC_KEY`: host public key mounted as `authorized_keys` for SSH access.
 
 Do not use `USER` or `HOME` for Compose interpolation in this file. Those names
@@ -83,6 +85,10 @@ docker compose --env-file .env -f rstudio.yml down
 
 ## SSH Access
 
+SSH access requires an image built with `INSTALL_SSH=true`. The Compose template
+can map the port and key for SSH, but a minimal RStudio image does not install
+the OpenSSH server unless that build arg is enabled.
+
 The example Compose file maps the host public key specified by
 `SSH_PUBLIC_KEY` to:
 
@@ -110,14 +116,22 @@ This Compose workflow is for running pre-built images from Docker Hub. If you
 want to rebuild images locally, use the canonical bake workflow in the root
 README and `../bake/image-builds.hcl`.
 
+For a local image with SSH support:
+
+```sh
+R_VERSION=4.6.0 UBUNTU_VERSION=noble INSTALL_SSH=true \
+docker buildx bake --file ../bake/image-builds.hcl --set '*.platform=linux/arm64' --load rstudio
+```
+
 ## Post-Installation Notes
 
 For image-level dependencies, prefer changing the Dockerfile or build scripts
 and rebuilding the image. For one-off runtime changes, set `ROOT=true` in
 `.env`, restart the container, and use `sudo` inside the RStudio session.
 
-If TeX was installed during image build with `INSTALL_TEX=true`, do not run
-post-install TeX setup again. Check availability first:
+If TeX was installed during image build with `TEX_VARIANT=base` or
+`TEX_VARIANT=full`, do not run post-install TeX setup again. Check availability
+first:
 
 ```sh
 pdflatex --version

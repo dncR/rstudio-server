@@ -5,8 +5,11 @@ ARG UBUNTU_VERSION
 FROM dncr/r-base:${R_VERSION:-latest}-${UBUNTU_VERSION:-noble}
 
 ARG RSTUDIO_VERSION
-ARG PREINSTALL_R_PKG
-ARG INSTALL_TEX
+ARG INSTALL_R_DEV_DEPS
+ARG INSTALL_R_CMD_CHECK_DEPS
+ARG TEX_VARIANT
+ARG INSTALL_JAVA
+ARG INSTALL_SSH
 
 ENV S6_VERSION=v2.1.0.2
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2026.04.0+526}
@@ -39,70 +42,26 @@ WORKDIR /home/rstudio/
 # without making the library world-writable.
 RUN /rocker_scripts/fix_r_site_library_permissions.sh
 
-# Install ubuntu packages
-# RUN apt-get update && apt-get install -y apt-utils
-RUN apt-get update && apt-get install -y libz-dev \
-  nano \
-  librsvg2-dev \
-  libcurl4-openssl-dev \
-  libssl-dev \
-  libxml2-dev \
-  libssh2-1-dev \
-  libgdal-dev \
-  libproj-dev \
-  libgeos-dev \
-  libglu1-mesa-dev \
-  libgmp3-dev \
-  libmpfr-dev \
-  libgl-dev \
-  libglpk-dev \
-  libharfbuzz-dev \
-  libfribidi-dev \
-  libgit2-dev && \
-  rm -rf /var/lib/apt/lists/*
-
-# Install OpenSSH server for remote development access
-RUN apt-get update && apt-get install -y openssh-server && \
-  rm -rf /var/lib/apt/lists/*
-
-# Configure SSH daemon and default authorized_keys location
-RUN mkdir -p /var/run/sshd /home/rstudio/.ssh && \
-  chown rstudio:rstudio /home/rstudio/.ssh && \
-  chmod 700 /home/rstudio/.ssh && \
-  sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
-  echo "PermitRootLogin no" >> /etc/ssh/sshd_config && \
-  echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
-
-# Manage sshd under s6 supervision
-RUN mkdir -p /etc/services.d/ssh && \
-  cat <<"EOF" >/etc/services.d/ssh/run
-#!/usr/bin/with-contenv bash
-exec /usr/sbin/sshd -D -e
-EOF
-
-# Ubuntu packages required for "R CMD check"
-RUN apt-get update && apt-get install -y qpdf \
-  ghostscript-x && \
-  rm -rf /var/lib/apt/lists/*
-
-# Preinstalled R packages for package developement
-RUN /rocker_scripts/preinstall_r_packages.sh && \
+# Optional R package development dependencies and preinstalled R packages.
+RUN /rocker_scripts/install_r_dev_deps.sh && \
   /rocker_scripts/fix_r_site_library_permissions.sh
 
-# Tex Live Installation
-RUN /rocker_scripts/texlive_full.sh
+# Optional Ubuntu packages required by R CMD check.
+RUN /rocker_scripts/install_r_cmd_check_deps.sh
 
-# Install Java and Reconfigure Java for R
-RUN apt-get update && apt-get install -y default-jdk \
-  default-jre && \
-  rm -rf /var/lib/apt/lists/*
+# Optional TeX Live installation.
+RUN /rocker_scripts/install_texlive_variant.sh
 
-RUN R CMD javareconf -e
+# Optional Java installation and R Java configuration.
+RUN /rocker_scripts/install_java.sh
+
+# Optional OpenSSH server for remote development access.
+RUN /rocker_scripts/install_ssh.sh
 
 # Set LANG from locale.
 RUN locale-gen ${LANG}
 
-# RStudio server runs on port 8787 by default. SSH uses 22.
+# RStudio Server uses port 8787. SSH uses port 22 when INSTALL_SSH=true.
 EXPOSE 22 8787
 
 CMD ["/init"]

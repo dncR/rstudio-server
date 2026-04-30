@@ -85,24 +85,22 @@ The default workflow is to pass variables directly in the terminal when running 
 
 ### Step 6.1: Build Docker image via `docker buildx`.
 
-Build docker images by passing variables inline:
+For multi-platform builds, publish images with `--push`:
 
 ```sh
-# Load into local image library. 
-# (Use --push to push created image directly to the Docker Hub repository. Login required.)
-
-# docker buildx bake --file bake/image-builds.hcl --builder multiarch --load <target>
-R_VERSION=latest UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds.hcl --builder multiarch --load r-base
+R_VERSION=latest UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
 ```
 
-Change environment variables and build images:
+For local testing, use `--load` with a single platform override:
 
 ```sh
-# Build a specific R version
-R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds.hcl --builder multiarch --load r-base
+R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds.hcl --builder multiarch --set r-base.platform=linux/arm64 --load r-base
+```
 
-# Build RStudio image with extra bake args
-R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 PREINSTALL_R_PKG=true INSTALL_TEX=false docker buildx bake --file bake/image-builds.hcl --builder multiarch --load
+Build an RStudio image with optional development features:
+
+```sh
+R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 INSTALL_R_DEV_DEPS=true INSTALL_R_CMD_CHECK_DEPS=true TEX_VARIANT=base INSTALL_SSH=true docker buildx bake --file bake/image-builds.hcl --builder multiarch --push rstudio
 ```
 
 Use `bake/image-builds.hcl` as the canonical build workflow. Its default group
@@ -112,12 +110,16 @@ local `r-base` target, so the build does not depend on an already-published
 the `r-base` target explicitly. For an RStudio build, run the default workflow
 or pass the `rstudio` target.
 
-For `bake/image-builds.hcl`, the extra args below control optional image customizations:
+For `bake/image-builds.hcl`, the extra args below control optional RStudio image customizations:
 
-- `INSTALL_TEX=true`: installs the full TeX Live distribution from Ubuntu's `apt` repository using `scripts/texlive_full.sh`.
-- `PREINSTALL_R_PKG=true`: installs pre-defined R packages from `scripts/preinstall_r_packages.sh` while building the image.
-  By default, this script installs `devtools` and `BiocManager`.
-  Developers can extend this script to preinstall additional R packages as needed.
+- `INSTALL_R_DEV_DEPS=true`: installs R package development system dependencies and preinstalls `devtools` and `BiocManager` using `scripts/install_r_dev_deps.sh`. This also forces Java installation, even when `INSTALL_JAVA=false`.
+- `INSTALL_R_CMD_CHECK_DEPS=true`: installs `qpdf` and `ghostscript-x` for `R CMD check` workflows using `scripts/install_r_cmd_check_deps.sh`.
+- `TEX_VARIANT=none|base|full`: controls TeX Live installation using `scripts/install_texlive_variant.sh`. The default is `none`; `base` installs a smaller TeX set, and `full` installs the full Ubuntu TeX Live distribution.
+- `INSTALL_JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
+- `INSTALL_SSH=true`: installs and configures OpenSSH Server under s6 supervision using `scripts/install_ssh.sh`.
+
+All optional RStudio build args default to `false`, so the default image keeps
+only the dependencies needed for RStudio Server and the base R environment.
 
 ### Step 6.2 (Optional): Use a `.env` file instead of typing variables every time
 
@@ -140,6 +142,8 @@ docker buildx bake --file bake/image-builds.hcl --builder multiarch --load
 ```
 
 This is optional and useful when you build frequently with the same variable set.
+Use `--push` for multi-platform output, or add a single-platform `--set`
+override when using `--load`.
 
 ## Experimental Shiny Server Files
 
