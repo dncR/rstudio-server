@@ -155,3 +155,11 @@ their respective `experimental` directories:
 
 Treat these files as experimental until the Shiny Server package source and
 platform support are verified for the target Ubuntu/R combination.
+
+## Acknowledgement
+
+The scripts in the `scripts` directory are copied from and adapted from the
+[`rocker-org/rocker-versioned2`](https://github.com/rocker-org/rocker-versioned2)
+project. They have been revised for this repository's needs while preserving
+credit to the original project and maintainers. Thank you to the rocker-org
+project for making these build scripts available.
