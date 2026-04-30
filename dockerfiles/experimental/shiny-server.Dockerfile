@@ -26,7 +26,7 @@ ENV SHINY_SERVER_VERSION=${SHINY_SERVER_VERSION:-latest}
 
 COPY scripts /rocker_scripts
 
-RUN /rocker_scripts/install_shiny_server.sh
+RUN /rocker_scripts/experimental/install_shiny_server.sh
 
 EXPOSE 3838
 

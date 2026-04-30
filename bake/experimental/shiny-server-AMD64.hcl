@@ -1,3 +1,6 @@
+// Experimental Shiny Server build target.
+// Keep this outside the canonical r-base/rstudio bake workflow until verified.
+
 group "default" {
   targets = ["shiny-server"]
 }
@@ -31,9 +34,9 @@ variable "SHINY_SERVER_VERSION" {
 }
 
 target "shiny-server" {
-  context = "../"
+  context = "../../"
   
-  dockerfile = "dockerfiles/shiny-server.Dockerfile"
+  dockerfile = "dockerfiles/experimental/shiny-server.Dockerfile"
 
   labels = {
     "org.opencontainers.image.title" = "dncr/shiny-server"

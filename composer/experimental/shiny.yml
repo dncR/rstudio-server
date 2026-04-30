@@ -1,0 +1,14 @@
+services:
+  shiny-server:
+    image: dncr/shiny-server:${R_VERSION:-latest}-${UBUNTU_VERSION:-jammy}
+    build:
+      context: ../../
+      dockerfile: dockerfiles/experimental/shiny-server.Dockerfile
+      args:
+        - R_VERSION=${R_VERSION:-latest}
+        - R_HOME=${R_HOME:-/usr/local/lib/R}
+        - TZ=${TZ:-Etc/UTC}
+        - LANG=${LANG_SET:-en_US.UTF-8}
+        - UBUNTU_VERSION=${UBUNTU_VERSION:-jammy}
+        - DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-noninteractive}
+        - SHINY_SERVER_VERSION=${SHINY_SERVER_VERSION:-latest}

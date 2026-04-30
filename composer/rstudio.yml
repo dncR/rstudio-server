@@ -1,12 +1,6 @@
 
 name: rstudio-${R_VERSION}
 
-# Network configurations for ShinyProxy service. Uncomment below code lines to create
-# a user-defined network (disables auto-configured networks).
-#networks:
-#  rstudio-network-4.2.1:
-#    name: rstudio-network-4.2.1
-
 services:
   rstudio-server:
     # Define container name before building it.

@@ -1,3 +1,7 @@
+// Experimental Shiny Server build target.
+// The installer currently downloads Posit's x86_64 Shiny Server package, so
+// validate ARM64 support before using this target for published images.
+
 group "default" {
   targets = ["shiny-server"]
 }
@@ -31,9 +35,9 @@ variable "SHINY_SERVER_VERSION" {
 }
 
 target "shiny-server" {
-  context = "../"
+  context = "../../"
   
-  dockerfile = "dockerfiles/shiny-server.Dockerfile"
+  dockerfile = "dockerfiles/experimental/shiny-server.Dockerfile"
 
   labels = {
     "org.opencontainers.image.title" = "dncr/shiny-server"
@@ -72,7 +76,7 @@ target "shiny-server" {
     }
   ]
   
-  platforms = ["linux/amd64"]
+  platforms = ["linux/arm64"]
 
   args = {
     "R_VERSION" = "${R_VERSION}"

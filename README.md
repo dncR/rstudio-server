@@ -140,3 +140,18 @@ docker buildx bake --file bake/image-builds.hcl --builder multiarch --load
 ```
 
 This is optional and useful when you build frequently with the same variable set.
+
+## Experimental Shiny Server Files
+
+Shiny Server support is kept outside the canonical `r-base` and `rstudio`
+workflow. Related Dockerfile, bake, compose, and installer assets live under
+their respective `experimental` directories:
+
+- `dockerfiles/experimental/shiny-server.Dockerfile`
+- `bake/experimental/shiny-server-AMD64.hcl`
+- `bake/experimental/shiny-server-ARM64.hcl`
+- `composer/experimental/shiny.yml`
+- `scripts/experimental/install_shiny_server.sh`
+
+Treat these files as experimental until the Shiny Server package source and
+platform support are verified for the target Ubuntu/R combination.
