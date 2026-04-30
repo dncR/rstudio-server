@@ -66,11 +66,6 @@ target "r-base" {
       type = "registry",
       ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
       mode = "max"
-    },
-    {
-      type = "local",
-      dest = "/tmp/docker/cache/r-base-${R_VERSION}-${UBUNTU_VERSION}",
-      mode = "max"
     }
   ]
 
@@ -78,10 +73,6 @@ target "r-base" {
     {
       ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
       type = "registry"
-    },
-    {
-      type = "local",
-      src = "/tmp/docker/cache/r-base-${R_VERSION}-${UBUNTU_VERSION}"
     }
   ]
 
@@ -123,11 +114,6 @@ target "rstudio" {
       type = "registry",
       ref = "docker.io/dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
       mode = "max"
-    },
-    {
-      type = "local",
-      dest = "/tmp/docker/cache/rstudio-server-${R_VERSION}-${UBUNTU_VERSION}",
-      mode = "max"
     }
   ]
 
@@ -139,14 +125,6 @@ target "rstudio" {
     {
       ref = "docker.io/dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
       type = "registry"
-    },
-    {
-      type = "local",
-      src = "/tmp/docker/cache/r-base-${R_VERSION}-${UBUNTU_VERSION}"
-    },
-    {
-      type = "local",
-      src = "/tmp/docker/cache/rstudio-server-${R_VERSION}-${UBUNTU_VERSION}"
     }
   ]
 

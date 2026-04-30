@@ -17,7 +17,9 @@ ENV QUARTO_VERSION=default
 ENV LANG=${LANG:-en_US.UTF-8}
 
 COPY scripts /rocker_scripts
-RUN chmod 777 -R /rocker_scripts
+RUN find /rocker_scripts -type d -exec chmod 755 {} + && \
+  find /rocker_scripts -type f -exec chmod 644 {} + && \
+  find /rocker_scripts -type f \( -name "*.sh" -o -name "*.R" -o -name "*.r" \) -exec chmod 755 {} +
 
 RUN /rocker_scripts/install_rstudio.sh
 RUN /rocker_scripts/install_pandoc.sh
@@ -33,10 +35,9 @@ WORKDIR /home/rstudio/
 # below and use usermod to avoid depending on the optional adduser package.
 # RUN usermod -aG sudo rstudio
 
-# Set permissions for R site-library
-# This step enables rstudio-server to write into site-library folders.
-RUN chown rstudio /usr/local/lib/R/site-library
-RUN chmod -R +rwx /usr/local/lib/R/site-library
+# Allow RStudio users in the staff group to install/update site-library packages
+# without making the library world-writable.
+RUN /rocker_scripts/fix_r_site_library_permissions.sh
 
 # Install ubuntu packages
 # RUN apt-get update && apt-get install -y apt-utils
@@ -85,16 +86,17 @@ RUN apt-get update && apt-get install -y qpdf \
   rm -rf /var/lib/apt/lists/*
 
 # Preinstalled R packages for package developement
-RUN /rocker_scripts/preinstall_r_packages.sh
+RUN /rocker_scripts/preinstall_r_packages.sh && \
+  /rocker_scripts/fix_r_site_library_permissions.sh
 
 # Tex Live Installation
 RUN /rocker_scripts/texlive_full.sh
 
 # Install Java and Reconfigure Java for R
 RUN apt-get update && apt-get install -y default-jdk \
-    default-jre && \
-    rm -rf /var/lib/apt/lists/*
-  
+  default-jre && \
+  rm -rf /var/lib/apt/lists/*
+
 RUN R CMD javareconf -e
 
 # Set LANG from locale.

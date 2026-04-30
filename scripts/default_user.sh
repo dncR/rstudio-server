@@ -9,7 +9,6 @@ else
     ## Need to configure non-root user for RStudio
     useradd -s /bin/bash -m "$DEFAULT_USER"
     echo "${DEFAULT_USER}:${DEFAULT_USER}" | chpasswd
-    usermod -a -G staff "${DEFAULT_USER}"
 
     ## Rocker's default RStudio settings, for better reproducibility
     mkdir -p "/home/${DEFAULT_USER}/.config/rstudio/"
@@ -23,6 +22,8 @@ else
 EOF
     chown -R "${DEFAULT_USER}:${DEFAULT_USER}" "/home/${DEFAULT_USER}"
 fi
+
+usermod -a -G staff "${DEFAULT_USER}"
 
 # If shiny server installed, make the user part of the shiny group
 if [ -x "$(command -v shiny-server)" ]; then
