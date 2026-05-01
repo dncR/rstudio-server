@@ -39,7 +39,7 @@ variable "SSH" {
 }
 
 target "rstudio" {
-  context = "../"
+  context = "."
   dockerfile = "dockerfiles/rstudio.Dockerfile"
 
   labels = {

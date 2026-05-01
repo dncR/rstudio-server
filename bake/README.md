@@ -4,6 +4,12 @@ This manual documents the environment variables consumed by the bake workflows i
 this directory. Pass values inline before `docker buildx bake`, or export them
 from a local environment file.
 
+Run bake commands from the project root directory. These HCL files use
+`context = "."`, so Dockerfile paths such as `dockerfiles/r-base.Dockerfile` are
+resolved relative to the directory where `docker buildx bake` is executed. If you
+run bake from another directory, update the relevant `context` values or adjust
+the relative paths before building.
+
 Example:
 
 ```sh

@@ -138,3 +138,7 @@ setting. Image-specific fields that do not apply are stored as JSON `null`;
 installed.
 
 See the root `README.md` for build examples.
+Run image build commands from the project root directory because the bake files
+use `context = "."`. If you run `docker buildx bake` from `composer/` or another
+directory, update the HCL `context` values or adjust relative paths before
+building.

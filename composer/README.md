@@ -126,13 +126,17 @@ Then update `SSH_PUBLIC_KEY` in `.env`.
 
 This Compose workflow is for running pre-built images from Docker Hub. If you
 want to rebuild images locally, use the canonical bake workflow in the root
-README and `../bake/image-builds.hcl`.
+README and run build commands from the project root directory. The bake files use
+`context = "."`; running them from `composer/` will make Docker resolve
+`dockerfiles/` and `scripts/` relative to `composer/` unless you update the
+context paths.
 
 For a local image with SSH support:
 
 ```sh
+cd ..
 R_VERSION=4.6.0 UBUNTU_VERSION=noble SSH=true \
-docker buildx bake --file ../bake/image-builds.hcl --set '*.platform=linux/arm64' --load rstudio
+docker buildx bake --file bake/image-builds.hcl --set '*.platform=linux/arm64' --load rstudio
 ```
 
 Published tags encode the R and Ubuntu versions, not optional build modules.

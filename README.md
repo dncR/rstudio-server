@@ -82,6 +82,11 @@ docker buildx inspect --bootstrap multiarch
 
 Build from a **bake.hcl** configuration file starts with setting required environment variables.
 The default workflow is to pass variables directly in the terminal when running `docker buildx bake`.
+Run the image build commands from the project root directory. The bake files use
+`context = "."`, so relative paths such as `dockerfiles/r-base.Dockerfile` and
+`scripts/` are resolved from the current working directory. If you run bake from
+another directory, update the relevant `context` values or adjust relative paths
+before building.
 
 ### Step 6.1: Build Docker image via `docker buildx`.
 

@@ -51,7 +51,7 @@ variable "JAVA" {
 }
 
 target "r-base" {
-  context = "../"
+  context = "."
   dockerfile = "dockerfiles/r-base.Dockerfile"
 
   labels = {

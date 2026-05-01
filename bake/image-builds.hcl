@@ -63,7 +63,7 @@ variable "SSH" {
 }
 
 target "r-base" {
-  context = "../"
+  context = "."
   dockerfile = "dockerfiles/r-base.Dockerfile"
 
   labels = {
@@ -111,7 +111,7 @@ target "r-base" {
 }
 
 target "rstudio" {
-  context = "../"
+  context = "."
   dockerfile = "dockerfiles/rstudio.Dockerfile"
 
   contexts = {
