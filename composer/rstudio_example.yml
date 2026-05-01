@@ -2,7 +2,7 @@ name: ${COMPOSE_PROJECT_NAME}
 
 services:
   rstudio-server:
-    image: dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}
+    image: ${RSTUDIO_IMAGE_REPO:-dncr/rstudio-server}:${R_VERSION}-${UBUNTU_VERSION}
     container_name: ${CONTAINER_NAME}
     environment:
       DEFAULT_USER: ${DEFAULT_USER:-rstudio}

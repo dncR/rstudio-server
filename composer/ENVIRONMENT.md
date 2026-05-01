@@ -9,6 +9,15 @@ cp .env_example .env
 
 ## Image Selection
 
+`RSTUDIO_IMAGE_REPO` selects the Docker image repository used by Compose. The
+default published repository is `dncr/rstudio-server`.
+
+Example:
+
+```env
+RSTUDIO_IMAGE_REPO=dncr/rstudio-server
+```
+
 `R_VERSION` selects the R version component of the image tag.
 
 Example:
@@ -28,7 +37,7 @@ UBUNTU_VERSION=noble
 Together these variables pull:
 
 ```text
-dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}
+${RSTUDIO_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}
 ```
 
 ## Compose Names
@@ -114,6 +123,9 @@ INSTALL_TEX
 INSTALL_JAVA
 INSTALL_SSH
 CACHE_REMOTE
+UBUNTU_IMAGE_REPO
+R_BASE_IMAGE_REPO
+RSTUDIO_IMAGE_REPO
 ```
 
 `R_BASE_MODE=base` keeps `r-base` minimal and ignores optional module args for
@@ -125,7 +137,17 @@ image and skips modules already recorded in metadata.
 
 Use `bake/image-builds.hcl` for the chained workflow. Use `bake/r-base.hcl` and
 `bake/rstudio.hcl` when you want to push `r-base` first and later build
-`rstudio` from the published `dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}` image.
+`rstudio` from the published
+`${R_BASE_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}` image.
+
+`R_BASE_IMAGE_REPO` defaults to `dncr/r-base` and controls the `r-base` image
+tag, registry cache reference, standalone RStudio base image, and metadata.
+`RSTUDIO_IMAGE_REPO` defaults to `dncr/rstudio-server` and controls the RStudio
+image tag, registry cache reference, Compose image, and metadata.
+`UBUNTU_IMAGE_REPO` defaults to `ubuntu` and controls the Ubuntu base image
+repository used by `r-base.Dockerfile`.
+Use Docker Hub repository names in `owner/name` form, without a leading
+`docker.io/` prefix.
 
 `R_DEV_DEPS=true` also forces Java installation during the image build, even
 when `INSTALL_JAVA=false`. Keep `INSTALL_JAVA` for images that need Java without the full R

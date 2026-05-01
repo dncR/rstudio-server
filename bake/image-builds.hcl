@@ -2,8 +2,16 @@ group "default" {
   targets = ["r-base", "rstudio"]
 }
 
-variable "DOCKER_HUB_REPO" {
+variable "UBUNTU_IMAGE_REPO" {
   default = "ubuntu"
+}
+
+variable "R_BASE_IMAGE_REPO" {
+  default = "dncr/r-base"
+}
+
+variable "RSTUDIO_IMAGE_REPO" {
+  default = "dncr/rstudio-server"
 }
 
 variable "UBUNTU_VERSION" {
@@ -71,27 +79,27 @@ target "r-base" {
   dockerfile = "dockerfiles/r-base.Dockerfile"
 
   labels = {
-    "org.opencontainers.image.title" = "dncr/r-base"
+    "org.opencontainers.image.title" = "${R_BASE_IMAGE_REPO}"
     "org.opencontainers.image.description" = "Reproducible builds to fixed version of R"
     "org.opencontainers.image.base.name" = "docker.io/library/ubuntu:${UBUNTU_VERSION}"
     "org.opencontainers.image.licenses" = "GPL-2.0-or-later"
     "org.opencontainers.image.source" = "https://github.com/dncr/rstudio-server"
-    "org.opencontainers.image.authors" = "Dincer Goksuluk <dincergoksuluk@erciyes.edu.tr>"
+    "org.opencontainers.image.authors" = "Dincer Goksuluk <dincergoksuluk@sakarya.edu.tr>"
   }
 
-  tags = ["dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}"]
+  tags = ["${R_BASE_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}"]
 
   cache-to = lower(CACHE_REMOTE) == "true" || CACHE_REMOTE == "1" ? [
     {
       type = "registry",
-      ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      ref = "docker.io/${R_BASE_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}",
       mode = "max"
     }
   ] : []
 
   cache-from = lower(CACHE_REMOTE) == "true" || CACHE_REMOTE == "1" ? [
     {
-      ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      ref = "docker.io/${R_BASE_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}",
       type = "registry"
     }
   ] : []
@@ -105,7 +113,9 @@ target "r-base" {
     "CRAN" = "${CRAN}"
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
-    "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
+    "UBUNTU_IMAGE_REPO" = "${UBUNTU_IMAGE_REPO}"
+    "R_BASE_IMAGE_REPO" = "${R_BASE_IMAGE_REPO}"
+    "RSTUDIO_IMAGE_REPO" = "${RSTUDIO_IMAGE_REPO}"
     "DEBIAN_FRONTEND" = "${DEBIAN_FRONTEND}"
     "R_BASE_MODE" = "${R_BASE_MODE}"
     "R_DEV_DEPS" = R_BASE_MODE == "dev" ? "true" : "${R_DEV_DEPS}"
@@ -119,13 +129,13 @@ target "rstudio" {
   dockerfile = "dockerfiles/rstudio.Dockerfile"
 
   contexts = {
-    "dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}" = "target:r-base"
+    "${R_BASE_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}" = "target:r-base"
   }
 
   labels = {
-    "org.opencontainers.image.title" = "dncr/rstudio"
+    "org.opencontainers.image.title" = "${RSTUDIO_IMAGE_REPO}"
     "org.opencontainers.image.description" = "Reproducible builds to fixed version of R"
-    "org.opencontainers.image.base.name" = "docker.io/library/ubuntu:${UBUNTU_VERSION}"
+    "org.opencontainers.image.base.name" = "docker.io/${R_BASE_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}"
     "org.opencontainers.image.licenses" = "GPL-2.0-or-later"
     "org.opencontainers.image.source" = "https://github.com/dncr/rstudio-server"
     "org.opencontainers.image.authors" = "Dincer Goksuluk <dincergoksuluk@erciyes.edu.tr>"
@@ -136,26 +146,28 @@ target "rstudio" {
   cache-to = lower(CACHE_REMOTE) == "true" || CACHE_REMOTE == "1" ? [
     {
       type = "registry",
-      ref = "docker.io/dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      ref = "docker.io/${RSTUDIO_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}",
       mode = "max"
     }
   ] : []
 
   cache-from = lower(CACHE_REMOTE) == "true" || CACHE_REMOTE == "1" ? [
     {
-      ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      ref = "docker.io/${R_BASE_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}",
       type = "registry"
     },
     {
-      ref = "docker.io/dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
+      ref = "docker.io/${RSTUDIO_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}",
       type = "registry"
     }
   ] : []
 
-  tags = ["dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}"]
+  tags = ["${RSTUDIO_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}"]
 
   args = {
     "R_VERSION" = "${R_VERSION}"
+    "R_BASE_IMAGE_REPO" = "${R_BASE_IMAGE_REPO}"
+    "RSTUDIO_IMAGE_REPO" = "${RSTUDIO_IMAGE_REPO}"
     "RSTUDIO_VERSION" = "${RSTUDIO_VERSION}"
     "DEFAULT_USER" = "${DEFAULT_USER}"
     "LANG" = "${R_LANG}"

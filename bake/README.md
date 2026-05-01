@@ -25,7 +25,7 @@ The repository provides three bake files:
 | --- | --- |
 | `bake/image-builds.hcl` | Canonical chained workflow. The `rstudio` target uses the local `r-base` target through BuildKit context wiring. |
 | `bake/r-base.hcl` | Standalone `r-base` build and push workflow. |
-| `bake/rstudio.hcl` | Standalone `rstudio` build workflow that uses the already-published `dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}` image. |
+| `bake/rstudio.hcl` | Standalone `rstudio` build workflow that uses the already-published `${R_BASE_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}` image. |
 
 Use `image-builds.hcl` when you want one reproducible chained build. Use the
 separate files when you want to build and push `r-base` first, then build
@@ -35,7 +35,9 @@ separate files when you want to build and push `r-base` first, then build
 
 | Argument | Default | Targets | Accepted values | Description |
 | --- | --- | --- | --- | --- |
-| `DOCKER_HUB_REPO` | `ubuntu` | `r-base` | Docker Hub image repository name | Base OS repository used by `r-base.Dockerfile`. The default resolves to `ubuntu:${UBUNTU_VERSION}`. |
+| `UBUNTU_IMAGE_REPO` | `ubuntu` | `r-base` | Docker Hub image repository name | Ubuntu base image repository used by `r-base.Dockerfile`. The default resolves to `ubuntu:${UBUNTU_VERSION}`. |
+| `R_BASE_IMAGE_REPO` | `dncr/r-base` | `r-base`, `rstudio` | Docker image repository, for example `myuser/r-base` | Repository used for the `r-base` image tag, registry cache reference, standalone RStudio base image, and metadata. |
+| `RSTUDIO_IMAGE_REPO` | `dncr/rstudio-server` | `rstudio` | Docker image repository, for example `myuser/rstudio-server` | Repository used for the RStudio image tag, registry cache reference, Compose image, and metadata. |
 | `UBUNTU_VERSION` | `noble` | `r-base`, `rstudio` | Ubuntu codenames supported by the Dockerfiles, for example `noble` | Ubuntu version used in image tags, base image selection, CRAN binary URL construction, and metadata. |
 | `R_VERSION` | `latest` | `r-base`, `rstudio` | `latest`, `devel`, `patched`, or an R version such as `4.6.0` | R version used by the R build scripts and image tags. |
 | `R_HOME` | `/usr/local/lib/R` | `r-base` | Absolute in-container path | Installation path for source-built R. |
@@ -76,8 +78,8 @@ as lowercase JSON `true` or `false`.
 - `--load` exports the final image to the local Docker image store and should be
   used with a single-platform override.
 - `CACHE_REMOTE=true` enables registry cache import/export through
-  `dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}` and
-  `dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}`.
+  `${R_BASE_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}` and
+  `${RSTUDIO_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}`.
 - `CACHE_REMOTE=false` is the default and disables remote registry cache. BuildKit
   can still use its local builder cache.
 
@@ -205,7 +207,7 @@ Example:
 Read metadata from an image:
 
 ```sh
-docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \
+docker run --rm ${RSTUDIO_IMAGE_REPO:-dncr/rstudio-server}:${R_VERSION}-${UBUNTU_VERSION} \
   cat /usr/local/share/rstudio-server-build/modules.json
 ```
 
@@ -214,10 +216,13 @@ docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \
 Image tags encode only `R_VERSION` and `UBUNTU_VERSION`:
 
 ```text
-dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}
-dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}
+${R_BASE_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}
+${RSTUDIO_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}
 ```
 
-They do not encode optional module choices. Rebuilding the same tag with
+The default repositories resolve to `dncr/r-base` and `dncr/rstudio-server`; override
+`R_BASE_IMAGE_REPO` and `RSTUDIO_IMAGE_REPO` to publish under your own Docker Hub
+repositories. Use Docker Hub repository names in `owner/name` form, without a
+leading `docker.io/` prefix. Tags do not encode optional module choices. Rebuilding the same tag with
 different build arguments can produce images with different optional components.
 Use `modules.json` to verify the actual image contents.

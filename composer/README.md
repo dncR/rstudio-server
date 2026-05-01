@@ -1,7 +1,8 @@
 # Creating Docker Container for Development Environment
 
 This directory contains Docker Compose templates for running the published
-`dncr/rstudio-server` images as a local RStudio Server development environment.
+the configured `${RSTUDIO_IMAGE_REPO}` image as a local RStudio Server
+development environment.
 The image is built from Ubuntu, R, and RStudio Server and supports both
 `linux/amd64` and `linux/arm64` through Docker's platform-aware image pull.
 
@@ -35,13 +36,14 @@ Then edit `.env` for your machine. At minimum, change:
 The Compose file pulls this image tag:
 
 ```text
-dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}
+${RSTUDIO_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}
 ```
 
 Important variables in `.env`:
 
 - `R_VERSION`: R version tag component, for example `latest` or `4.6.0`.
 - `UBUNTU_VERSION`: Ubuntu codename tag component, for example `noble`.
+- `RSTUDIO_IMAGE_REPO`: Docker image repository for RStudio. The default is `dncr/rstudio-server`.
 - `BIND_ADDRESS`: host interface to bind; keep `127.0.0.1` for local-only access.
 - `PORT`: host port mapped to RStudio Server port `8787`.
 - `SSH_PORT`: host port mapped to SSH port `22`.
@@ -55,6 +57,9 @@ Important variables in `.env`:
 Boolean runtime values are case-insensitive for `true` and `false`; `1` and `0`
 are also accepted. For example, `ROOT=TRUE`, `ROOT=True`, `ROOT=TRuE`, and
 `ROOT=1` all enable passwordless sudo.
+
+Use Docker Hub repository names in `owner/name` form for `RSTUDIO_IMAGE_REPO`,
+without a leading `docker.io/` prefix.
 
 Do not use `USER` or `HOME` for Compose interpolation in this file. Those names
 are commonly exported by the host shell and can override `.env` values during
@@ -164,7 +169,7 @@ shows the final image state, and `components` keeps separate requested/installed
 records for each layer:
 
 ```sh
-docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \
+docker run --rm ${RSTUDIO_IMAGE_REPO:-dncr/rstudio-server}:${R_VERSION}-${UBUNTU_VERSION} \
   cat /usr/local/share/rstudio-server-build/modules.json
 ```
 

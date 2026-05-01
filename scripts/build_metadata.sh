@@ -282,8 +282,8 @@ metadata_write_state() {
 
     r_version_json=$(metadata_json_string_or_null "$r_version")
     ubuntu_version_json=$(metadata_json_string_or_null "$ubuntu_version")
-    rb_image_json=$(metadata_image_ref "dncr/r-base" "$r_version" "$ubuntu_version")
-    rs_image_json=$(metadata_image_ref "dncr/rstudio-server" "$r_version" "$ubuntu_version")
+    rb_image_json=$(metadata_image_ref "${R_BASE_IMAGE_REPO:-dncr/r-base}" "$r_version" "$ubuntu_version")
+    rs_image_json=$(metadata_image_ref "${RSTUDIO_IMAGE_REPO:-dncr/rstudio-server}" "$r_version" "$ubuntu_version")
     rb_default_user_json=$(metadata_json_string_or_null "$rb_default_user")
     rb_rstudio_version_json=$(metadata_json_string_or_null "$rb_rstudio_version")
     rb_mode_json=$(metadata_json_string_or_null "$rb_mode")
