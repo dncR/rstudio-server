@@ -113,81 +113,14 @@ it manually.
 ## Build-Time Options
 
 The `.env_example` file controls Compose runtime behavior. It does not rebuild
-the image. Optional image features are controlled at build time through
-the bake files under `bake/`:
+the image. Optional image features such as `R_DEV_DEPS`, `INSTALL_TEX`,
+`INSTALL_JAVA`, `INSTALL_SSH`, and registry cache settings are build-time
+arguments handled by the bake files under `bake/`.
 
-```text
-R_BASE_MODE
-R_DEV_DEPS
-INSTALL_TEX
-INSTALL_JAVA
-INSTALL_SSH
-CACHE_REMOTE
-CACHE_MODE
-UBUNTU_IMAGE_REPO
-R_BASE_IMAGE_REPO
-RSTUDIO_IMAGE_REPO
-```
-
-`R_BASE_MODE=base` keeps `r-base` minimal and ignores optional module args for
-that target. `R_BASE_MODE=dev` enables r-base development mode and forces
-`R_DEV_DEPS=true` inside the `r-base` image, even if `R_DEV_DEPS=false` was
-provided. Other module args such as `INSTALL_TEX` still depend on their own values. The
-`rstudio` target can install selected modules on top of the inherited `r-base`
-image and skips modules already recorded in metadata.
-
-Use `bake/image-builds.hcl` for the chained workflow. Use `bake/r-base.hcl` and
-`bake/rstudio.hcl` when you want to push `r-base` first and later build
-`rstudio` from the published
-`${R_BASE_IMAGE_REPO}:${R_VERSION}-${UBUNTU_VERSION}` image.
-
-`R_BASE_IMAGE_REPO` defaults to `dncr/r-base` and controls the `r-base` image
-tag, registry cache reference, standalone RStudio base image, and metadata.
-`RSTUDIO_IMAGE_REPO` defaults to `dncr/rstudio-server` and controls the RStudio
-image tag, registry cache reference, Compose image, and metadata.
-`UBUNTU_IMAGE_REPO` defaults to `ubuntu` and controls the Ubuntu base image
-repository used by `r-base.Dockerfile`.
-Use Docker Hub repository names in `owner/name` form, without a leading
-`docker.io/` prefix.
-
-`R_DEV_DEPS=true` also forces Java installation during the image build, even
-when `INSTALL_JAVA=false`. Keep `INSTALL_JAVA` for images that need Java without the full R
-development dependency set. For `r-base`, `R_BASE_MODE=dev` forces
-`R_DEV_DEPS=true`; for `rstudio`, `R_DEV_DEPS` follows the value you provide.
-`INSTALL_TEX` accepts `none`, `base`, `extra`, or `full`; the default is
-`none`.
-
-Boolean build values are case-insensitive for `true` and `false`; `1` and `0`
-are also accepted. This applies to `R_DEV_DEPS`, `INSTALL_JAVA`, and
-`INSTALL_SSH`. `CACHE_REMOTE` follows the same boolean rules and controls
-registry cache import/export only. The build metadata is still canonical:
-`modules.json` always renders boolean fields as lowercase JSON `true` or
-`false`, regardless of whether the input was `TRUE`, `True`, `1`, or another
-accepted spelling.
-
-`--push`, `--load`, and remote cache are separate build outputs. `--push`
-publishes the final image tag to a registry. `--load` loads a single-platform
-final image into the local Docker image store. `CACHE_REMOTE=true` enables
-registry cache import/export through `cache-*` tags; `CACHE_REMOTE=false` is the
-default and avoids writing those cache tags.
-
-`CACHE_MODE` controls registry cache export mode only when `CACHE_REMOTE=true`.
-The default is `min`, which exports a smaller registry cache and is less likely
-to fail during cache push. `CACHE_MODE=max` exports the broadest cache data, but
-it can trigger registry errors such as Docker Hub `400 Bad Request` responses
-during large cache blob uploads. In `bake/image-builds.hcl`, one `CACHE_MODE`
-value applies to all targets; in the separate `bake/r-base.hcl` and
-`bake/rstudio.hcl` workflows, each build can use a different value.
-
-Image tags encode R and Ubuntu versions, not optional modules. Inspect
-`/usr/local/share/rstudio-server-build/modules.json` inside an image to see the
-actual optional module state, build user, RStudio version, and requested TeX
-setting. `image_chain` identifies whether the image is `r-base` only or
-`r-base + rstudio`; `effective.modules` shows the final image state, and
-`components` keeps separate requested/installed records for each layer.
-
-See the root `README.md` for build examples.
-Run image build commands from the project root directory because the bake files
-use `context = "."`. If you run `docker buildx bake` from `composer/` or another
+Use the [root README](../README.md) for build examples and
+[`bake/README.md`](../bake/README.md) for the full build argument, cache, target
+behavior, and metadata reference. Run image build commands from the project root
+directory because the bake files use
+`context = "."`; if you run `docker buildx bake` from `composer/` or another
 directory, update the HCL `context` values or adjust relative paths before
 building.

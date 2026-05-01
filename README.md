@@ -137,45 +137,17 @@ R_VERSION=4.4.3 UBUNTU_VERSION=noble CACHE_REMOTE=true docker buildx bake --file
 R_VERSION=4.4.3 UBUNTU_VERSION=noble INSTALL_SSH=true INSTALL_TEX=extra INSTALL_JAVA=true CACHE_REMOTE=true docker buildx bake --file bake/rstudio.hcl --builder multiarch --push rstudio
 ```
 
-For `bake/image-builds.hcl`, the extra args below control optional image customizations:
+See [`bake/README.md`](bake/README.md) for the complete build argument, cache,
+target behavior, and metadata reference. Keep Docker Hub repository names in
+`owner/name` form for `R_BASE_IMAGE_REPO` and `RSTUDIO_IMAGE_REPO`; do not
+include a leading `docker.io/` prefix.
 
-- `DEFAULT_USER=rstudio`: sets the Linux user created for the `rstudio` image. The default is defined as an image environment variable during build.
-- `UBUNTU_IMAGE_REPO=ubuntu`: sets the Ubuntu base image repository used by `r-base.Dockerfile`. The default resolves to `ubuntu:${UBUNTU_VERSION}`.
-- `R_BASE_IMAGE_REPO=dncr/r-base`: repository used for the `r-base` image tag, registry cache reference, standalone RStudio base image, and metadata.
-- `RSTUDIO_IMAGE_REPO=dncr/rstudio-server`: repository used for the RStudio image tag, registry cache reference, Compose image, and metadata.
-- `R_BASE_MODE=base|dev`: controls whether optional modules are allowed in the `r-base` target. The default `base` ignores optional module args for `r-base`; `dev` enables r-base development mode and forces `R_DEV_DEPS=true` for the `r-base` image.
-- `R_DEV_DEPS=true`: installs R package development system dependencies, `qpdf` and `ghostscript-x` for R package checks, and preinstalls `devtools` and `BiocManager` using `scripts/install_r_dev_deps.sh`. This also forces Java installation, even when `INSTALL_JAVA=false`. In `r-base`, `R_BASE_MODE=dev` forces this behavior even if `R_DEV_DEPS=false`.
-- `INSTALL_TEX=none|base|extra|full`: controls TeX Live installation using `scripts/install_texlive_variant.sh`. The default is `none`; `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs the full Ubuntu TeX Live distribution.
-- `INSTALL_JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
-- `INSTALL_SSH=true`: installs and configures OpenSSH Server under s6 supervision for the `rstudio` image using `scripts/install_ssh.sh`.
-- `CACHE_REMOTE=true`: enables registry cache import/export. The default is `false`, which avoids reading or writing `cache-*` tags.
-- `CACHE_MODE=min`: registry cache export mode used when `CACHE_REMOTE=true`. `min` is the default because `CACHE_MODE=max` can trigger registry cache push failures such as Docker Hub `400 Bad Request` responses during large cache blob uploads.
-
-See `bake/README.md` for the complete build argument reference.
-
-Use Docker Hub repository names in `owner/name` form for `R_BASE_IMAGE_REPO` and
-`RSTUDIO_IMAGE_REPO`, for example `myuser/r-base`; do not include a leading
-`docker.io/` prefix.
-
-Boolean optional build args default to `false`, and `INSTALL_TEX` defaults to
-`none`. Boolean values are case-insensitive for `true` and `false`, and `1`/`0`
-are accepted as aliases. For example, `R_DEV_DEPS=TRUE`, `R_DEV_DEPS=True`,
-`R_DEV_DEPS=TRuE`, and `R_DEV_DEPS=1` all enable the option. Metadata remains
-canonical: `/usr/local/share/rstudio-server-build/modules.json` always renders
-boolean values as lowercase JSON `true` or `false`, regardless of the input
-style. With `R_BASE_MODE=base`,
-the `r-base` image keeps only the base R environment even if optional module
-args are set. The `rstudio` image can still install selected optional modules
-on top of the inherited `r-base` image.
-
-The RStudio Server image uses `DEFAULT_USER=rstudio` by default. If you build an
-image with a different `DEFAULT_USER`, use the same value in Compose so runtime
-paths, SSH keys, and login credentials target the correct user home.
-Treat this as a hard requirement: if the build-time `DEFAULT_USER`, the Compose
-`.env` value, and any exported shell `DEFAULT_USER` value do not match, Compose
-startup or login can fail. Shell environment variables take precedence over
-values loaded from `.env`, so check `env | grep DEFAULT_USER` when debugging a
-user/path mismatch.
+Two build-time details are worth checking before running Compose with a custom
+image. First, boolean optional build args accept case-insensitive `true`/`false`
+and `1`/`0`, while metadata is always rendered as canonical JSON booleans.
+Second, if you build an image with a custom `DEFAULT_USER`, use the same value in
+Compose and in any exported shell environment. If the build-time value, Compose
+`.env` value, and shell value do not match, Compose startup or login can fail.
 
 Image tags encode the R and Ubuntu versions, not the optional build modules.
 Rebuilding the same tag with different build arguments can produce images with
@@ -187,13 +159,8 @@ docker run --rm ${RSTUDIO_IMAGE_REPO:-dncr/rstudio-server}:${R_VERSION}-${UBUNTU
   cat /usr/local/share/rstudio-server-build/modules.json
 ```
 
-The same metadata path is available in `R_BASE_IMAGE_REPO` images. The
-`image_chain` field is `r-base` for base-only images and `r-base + rstudio` when
-the RStudio layer is added. `effective.modules` records the final image state,
-while `components.r_base` and `components.rstudio` keep separate `requested` and
-`modules` records for each layer. When RStudio skips a module because it was
-already available from `r-base`, that decision is recorded under
-`components.rstudio.skipped_from_base`.
+The same metadata path is available in `R_BASE_IMAGE_REPO` images. The schema and
+component-level fields are documented in [`bake/README.md`](bake/README.md).
 
 ### Step 6.2 (Optional): Use a `.env` file instead of typing variables every time
 

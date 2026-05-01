@@ -1,8 +1,7 @@
 # Creating Docker Container for Development Environment
 
-This directory contains Docker Compose templates for running the published
-the configured `${RSTUDIO_IMAGE_REPO}` image as a local RStudio Server
-development environment.
+This directory contains Docker Compose templates for running the configured
+`${RSTUDIO_IMAGE_REPO}` image as a local RStudio Server development environment.
 The image is built from Ubuntu, R, and RStudio Server and supports both
 `linux/amd64` and `linux/arm64` through Docker's platform-aware image pull.
 
@@ -15,7 +14,7 @@ Local runtime configuration is intentionally separated from publishable examples
 - `.env`: local environment file, ignored by git.
 - `rstudio.yml`: local Compose file, ignored by git.
 
-See `ENVIRONMENT.md` for the full `.env_example` reference.
+See [`ENVIRONMENT.md`](ENVIRONMENT.md) for the full `.env_example` reference.
 
 Create local files from the examples before running Compose:
 
@@ -135,8 +134,9 @@ Then update `SSH_PUBLIC_KEY` in `.env`.
 ## Local Builds
 
 This Compose workflow is for running pre-built images from Docker Hub. If you
-want to rebuild images locally, use the canonical bake workflow in the root
-README and run build commands from the project root directory. The bake files use
+want to rebuild images locally, use the canonical bake workflow in the
+[root README](../README.md) and run build commands from the project root
+directory. The bake files use
 `context = "."`; running them from `composer/` will make Docker resolve
 `dockerfiles/` and `scripts/` relative to `composer/` unless you update the
 context paths.
@@ -150,27 +150,13 @@ docker buildx bake --file bake/image-builds.hcl --set '*.platform=linux/arm64' -
 ```
 
 Boolean build args such as `R_DEV_DEPS`, `INSTALL_JAVA`, and `INSTALL_SSH` accept
-case-insensitive `true`/`false` and numeric `1`/`0`. `CACHE_REMOTE` follows the
-same boolean rules and controls registry cache import/export only. It defaults
-to `false`, so local `--load` builds do not write the configured registry cache
-refs unless you explicitly set `CACHE_REMOTE=true`. The generated `modules.json`
-still stores boolean metadata as lowercase JSON `true` or `false`, regardless of
-the input style.
-
-`--push` publishes the final image tag to a registry. `--load` loads a
-single-platform final image into the local Docker image store. Registry cache is
-separate from both and is controlled by `CACHE_REMOTE`.
-When remote cache is enabled, `CACHE_MODE=min` is the default because it exports
-a smaller cache and is less likely to fail during registry cache push.
-`CACHE_MODE=max` exports broader cache data, but it can trigger registry errors
-such as Docker Hub `400 Bad Request` responses during large cache blob uploads.
+case-insensitive `true`/`false` and numeric `1`/`0`. See
+[`bake/README.md`](../bake/README.md) for the full build argument, cache, and
+metadata reference.
 
 Published tags encode the R and Ubuntu versions, not optional build modules.
 Check the image metadata to see which optional modules, build user, RStudio
-version, and requested TeX setting were included. `image_chain` identifies
-whether the image is `r-base` only or `r-base + rstudio`; `effective.modules`
-shows the final image state, and `components` keeps separate requested/installed
-records for each layer:
+version, and requested TeX setting were included:
 
 ```sh
 docker run --rm ${RSTUDIO_IMAGE_REPO:-dncr/rstudio-server}:${R_VERSION}-${UBUNTU_VERSION} \
@@ -190,6 +176,3 @@ again. Check availability first:
 ```sh
 pdflatex --version
 ```
-
-The installation scripts are adapted from the
-[Rocker Project](https://github.com/rocker-org/rocker-versioned2).
