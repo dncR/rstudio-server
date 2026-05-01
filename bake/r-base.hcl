@@ -50,6 +50,10 @@ variable "INSTALL_JAVA" {
   default = "false"
 }
 
+variable "CACHE_REMOTE" {
+  default = "false"
+}
+
 target "r-base" {
   context = "."
   dockerfile = "dockerfiles/r-base.Dockerfile"
@@ -65,20 +69,20 @@ target "r-base" {
 
   tags = ["dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}"]
 
-  cache-to = [
+  cache-to = lower(CACHE_REMOTE) == "true" || CACHE_REMOTE == "1" ? [
     {
       type = "registry",
       ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
       mode = "max"
     }
-  ]
+  ] : []
 
-  cache-from = [
+  cache-from = lower(CACHE_REMOTE) == "true" || CACHE_REMOTE == "1" ? [
     {
       ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
       type = "registry"
     }
-  ]
+  ] : []
 
   platforms = ["linux/amd64", "linux/arm64"]
 

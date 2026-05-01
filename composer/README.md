@@ -145,9 +145,16 @@ docker buildx bake --file bake/image-builds.hcl --set '*.platform=linux/arm64' -
 ```
 
 Boolean build args such as `R_DEV_DEPS`, `INSTALL_JAVA`, and `INSTALL_SSH` accept
-case-insensitive `true`/`false` and numeric `1`/`0`. The generated
-`modules.json` still stores boolean metadata as lowercase JSON `true` or
-`false`, regardless of the input style.
+case-insensitive `true`/`false` and numeric `1`/`0`. `CACHE_REMOTE` follows the
+same boolean rules and controls registry cache import/export only. It defaults
+to `false`, so local `--load` builds do not write the configured registry cache
+refs unless you explicitly set `CACHE_REMOTE=true`. The generated `modules.json`
+still stores boolean metadata as lowercase JSON `true` or `false`, regardless of
+the input style.
+
+`--push` publishes the final image tag to a registry. `--load` loads a
+single-platform final image into the local Docker image store. Registry cache is
+separate from both and is controlled by `CACHE_REMOTE`.
 
 Published tags encode the R and Ubuntu versions, not optional build modules.
 Check the image metadata to see which optional modules, build user, RStudio

@@ -38,6 +38,10 @@ variable "INSTALL_SSH" {
   default = "false"
 }
 
+variable "CACHE_REMOTE" {
+  default = "false"
+}
+
 target "rstudio" {
   context = "."
   dockerfile = "dockerfiles/rstudio.Dockerfile"
@@ -53,15 +57,15 @@ target "rstudio" {
 
   platforms = ["linux/amd64", "linux/arm64"]
 
-  cache-to = [
+  cache-to = lower(CACHE_REMOTE) == "true" || CACHE_REMOTE == "1" ? [
     {
       type = "registry",
       ref = "docker.io/dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
       mode = "max"
     }
-  ]
+  ] : []
 
-  cache-from = [
+  cache-from = lower(CACHE_REMOTE) == "true" || CACHE_REMOTE == "1" ? [
     {
       ref = "docker.io/dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}",
       type = "registry"
@@ -70,7 +74,7 @@ target "rstudio" {
       ref = "docker.io/dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
       type = "registry"
     }
-  ]
+  ] : []
 
   tags = ["dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION}"]
 

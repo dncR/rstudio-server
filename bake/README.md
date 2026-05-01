@@ -45,6 +45,7 @@ separate files when you want to build and push `r-base` first, then build
 | `DEBIAN_FRONTEND` | `noninteractive` | `r-base` | Usually `noninteractive` | Debian frontend used during apt-based image builds. |
 | `RSTUDIO_VERSION` | `2026.04.0+526` | `rstudio` | `stable`, `preview`, `daily`, `latest`, or a Posit/RStudio Server version | RStudio Server version installed by `scripts/install_rstudio.sh`. |
 | `DEFAULT_USER` | `rstudio` | `rstudio` | Linux username | Linux user created by `scripts/default_user.sh` for RStudio login and home-directory setup. Keep Compose `DEFAULT_USER` aligned with this value for custom images. |
+| `CACHE_REMOTE` | `false` | `r-base`, `rstudio` | `true`, `false`, `1`, `0` | Enables registry cache import/export through `cache-*` tags. It does not control final image output. |
 
 ## Optional Module Arguments
 
@@ -65,6 +66,24 @@ are also accepted. For example, `INSTALL_JAVA=TRUE`, `INSTALL_JAVA=True`,
 `INSTALL_JAVA=TRuE`, and `INSTALL_JAVA=1` all enable Java. The metadata file
 does not preserve input spelling: `modules.json` always renders boolean fields
 as lowercase JSON `true` or `false`.
+
+## Output and Cache Behavior
+
+`--push`, `--load`, and registry cache control different outputs:
+
+- `--push` exports the final image tag to a registry and is the normal choice for
+  multi-platform images.
+- `--load` exports the final image to the local Docker image store and should be
+  used with a single-platform override.
+- `CACHE_REMOTE=true` enables registry cache import/export through
+  `dncr/r-base:cache-${R_VERSION}-${UBUNTU_VERSION}` and
+  `dncr/rstudio-server:cache-${R_VERSION}-${UBUNTU_VERSION}`.
+- `CACHE_REMOTE=false` is the default and disables remote registry cache. BuildKit
+  can still use its local builder cache.
+
+`CACHE_REMOTE` does not push the final image by itself. Conversely, `--load` can
+still write registry cache when `CACHE_REMOTE=true`; with the default
+`CACHE_REMOTE=false`, `--load` does not write the configured registry cache refs.
 
 Shell environment variables are read by `docker buildx bake` before defaults in
 this file. If `DEFAULT_USER`, `INSTALL_TEX`, or another build argument is

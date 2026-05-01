@@ -113,6 +113,7 @@ R_DEV_DEPS
 INSTALL_TEX
 INSTALL_JAVA
 INSTALL_SSH
+CACHE_REMOTE
 ```
 
 `R_BASE_MODE=base` keeps `r-base` minimal and ignores optional module args for
@@ -135,9 +136,17 @@ development dependency set. For `r-base`, `R_BASE_MODE=dev` forces
 
 Boolean build values are case-insensitive for `true` and `false`; `1` and `0`
 are also accepted. This applies to `R_DEV_DEPS`, `INSTALL_JAVA`, and
-`INSTALL_SSH`. The build metadata is still canonical: `modules.json` always
-renders boolean fields as lowercase JSON `true` or `false`, regardless of
-whether the input was `TRUE`, `True`, `1`, or another accepted spelling.
+`INSTALL_SSH`. `CACHE_REMOTE` follows the same boolean rules and controls
+registry cache import/export only. The build metadata is still canonical:
+`modules.json` always renders boolean fields as lowercase JSON `true` or
+`false`, regardless of whether the input was `TRUE`, `True`, `1`, or another
+accepted spelling.
+
+`--push`, `--load`, and remote cache are separate build outputs. `--push`
+publishes the final image tag to a registry. `--load` loads a single-platform
+final image into the local Docker image store. `CACHE_REMOTE=true` enables
+registry cache import/export through `cache-*` tags; `CACHE_REMOTE=false` is the
+default and avoids writing those cache tags.
 
 Image tags encode R and Ubuntu versions, not optional modules. Inspect
 `/usr/local/share/rstudio-server-build/modules.json` inside an image to see the

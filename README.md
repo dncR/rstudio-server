@@ -93,7 +93,7 @@ before building.
 For multi-platform builds, publish images with `--push`:
 
 ```sh
-R_VERSION=latest UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
+R_VERSION=latest UBUNTU_VERSION=noble CACHE_REMOTE=true docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
 ```
 
 For local testing, use `--load` with a single platform override:
@@ -102,10 +102,16 @@ For local testing, use `--load` with a single platform override:
 R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds.hcl --builder multiarch --set r-base.platform=linux/arm64 --load r-base
 ```
 
+`--push`, `--load`, and registry cache are separate concerns. `--push` exports
+the final image tag to the registry. `--load` exports a single-platform image to
+the local Docker image store. `CACHE_REMOTE=true` enables registry cache
+import/export through the `cache-*` tags; it does not push the final image by
+itself. `CACHE_REMOTE=false` is the default and disables remote registry cache.
+
 Build an RStudio image with optional development features:
 
 ```sh
-R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 R_DEV_DEPS=true INSTALL_TEX=base INSTALL_SSH=true docker buildx bake --file bake/image-builds.hcl --builder multiarch --push rstudio
+R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 R_DEV_DEPS=true INSTALL_TEX=base INSTALL_SSH=true CACHE_REMOTE=true docker buildx bake --file bake/image-builds.hcl --builder multiarch --push rstudio
 ```
 
 Build a CLI-first `r-base` development image with optional modules:
@@ -127,8 +133,8 @@ then use `bake/rstudio.hcl` to build `rstudio` from the already-published
 workflow does not solve the local `r-base` target again:
 
 ```sh
-R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/r-base.hcl --builder multiarch --push r-base
-R_VERSION=4.4.3 UBUNTU_VERSION=noble INSTALL_SSH=true INSTALL_TEX=extra INSTALL_JAVA=true docker buildx bake --file bake/rstudio.hcl --builder multiarch --push rstudio
+R_VERSION=4.4.3 UBUNTU_VERSION=noble CACHE_REMOTE=true docker buildx bake --file bake/r-base.hcl --builder multiarch --push r-base
+R_VERSION=4.4.3 UBUNTU_VERSION=noble INSTALL_SSH=true INSTALL_TEX=extra INSTALL_JAVA=true CACHE_REMOTE=true docker buildx bake --file bake/rstudio.hcl --builder multiarch --push rstudio
 ```
 
 For `bake/image-builds.hcl`, the extra args below control optional image customizations:
@@ -139,6 +145,7 @@ For `bake/image-builds.hcl`, the extra args below control optional image customi
 - `INSTALL_TEX=none|base|extra|full`: controls TeX Live installation using `scripts/install_texlive_variant.sh`. The default is `none`; `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs the full Ubuntu TeX Live distribution.
 - `INSTALL_JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
 - `INSTALL_SSH=true`: installs and configures OpenSSH Server under s6 supervision for the `rstudio` image using `scripts/install_ssh.sh`.
+- `CACHE_REMOTE=true`: enables registry cache import/export. The default is `false`, which avoids reading or writing `cache-*` tags.
 
 See `bake/README.md` for the complete build argument reference.
 
@@ -197,12 +204,12 @@ set -a
 source .env
 set +a
 
-docker buildx bake --file bake/image-builds.hcl --builder multiarch --load
+docker buildx bake --file bake/image-builds.hcl --builder multiarch --set '*.platform=linux/arm64' --load r-base
 ```
 
 This is optional and useful when you build frequently with the same variable set.
-Use `--push` for multi-platform output, or add a single-platform `--set`
-override when using `--load`.
+Use `--push` for multi-platform output. When using `--load`, add a
+single-platform `--set` override and usually pass an explicit target.
 
 ## Experimental Shiny Server Files
 
