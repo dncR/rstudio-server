@@ -106,7 +106,7 @@ R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 R_DEV_DEPS=tr
 Build a CLI-first `r-base` development image with optional modules:
 
 ```sh
-R_VERSION=4.4.3 UBUNTU_VERSION=noble R_BASE_MODE=dev R_DEV_DEPS=true TEX=base docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
+R_VERSION=4.4.3 UBUNTU_VERSION=noble R_BASE_MODE=dev TEX=base docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
 ```
 
 Use `bake/image-builds.hcl` as the canonical build workflow. Its default group
@@ -129,8 +129,8 @@ R_VERSION=4.4.3 UBUNTU_VERSION=noble SSH=true TEX=extra JAVA=true docker buildx 
 For `bake/image-builds.hcl`, the extra args below control optional image customizations:
 
 - `DEFAULT_USER=rstudio`: sets the Linux user created for the `rstudio` image. The default is defined as an image environment variable during build.
-- `R_BASE_MODE=base|dev`: controls whether optional modules are allowed in the `r-base` target. The default `base` ignores optional module args for `r-base`; `dev` enables the selected optional modules in `r-base`.
-- `R_DEV_DEPS=true`: installs R package development system dependencies, `qpdf` and `ghostscript-x` for R package checks, and preinstalls `devtools` and `BiocManager` using `scripts/install_r_dev_deps.sh`. This also forces Java installation, even when `JAVA=false`.
+- `R_BASE_MODE=base|dev`: controls whether optional modules are allowed in the `r-base` target. The default `base` ignores optional module args for `r-base`; `dev` enables r-base development mode and forces `R_DEV_DEPS=true` for the `r-base` image.
+- `R_DEV_DEPS=true`: installs R package development system dependencies, `qpdf` and `ghostscript-x` for R package checks, and preinstalls `devtools` and `BiocManager` using `scripts/install_r_dev_deps.sh`. This also forces Java installation, even when `JAVA=false`. In `r-base`, `R_BASE_MODE=dev` forces this behavior even if `R_DEV_DEPS=false`.
 - `TEX=none|base|extra|full`: controls TeX Live installation using `scripts/install_texlive_variant.sh`. The default is `none`; `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs the full Ubuntu TeX Live distribution.
 - `JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
 - `SSH=true`: installs and configures OpenSSH Server under s6 supervision for the `rstudio` image using `scripts/install_ssh.sh`.

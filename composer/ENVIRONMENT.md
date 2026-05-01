@@ -112,17 +112,20 @@ SSH
 ```
 
 `R_BASE_MODE=base` keeps `r-base` minimal and ignores optional module args for
-that target. `R_BASE_MODE=dev` allows selected optional modules to be installed
-into `r-base`. The `rstudio` target can install selected modules on top of the
-inherited `r-base` image and skips modules already recorded in metadata.
+that target. `R_BASE_MODE=dev` enables r-base development mode and forces
+`R_DEV_DEPS=true` inside the `r-base` image, even if `R_DEV_DEPS=false` was
+provided. Other module args such as `TEX` still depend on their own values. The
+`rstudio` target can install selected modules on top of the inherited `r-base`
+image and skips modules already recorded in metadata.
 
 Use `bake/image-builds.hcl` for the chained workflow. Use `bake/r-base.hcl` and
 `bake/rstudio.hcl` when you want to push `r-base` first and later build
 `rstudio` from the published `dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}` image.
 
-`R_DEV_DEPS=true` also forces Java installation during the image build,
-even when `JAVA=false`. Keep `JAVA` for images that need Java
-without the full R development dependency set.
+`R_DEV_DEPS=true` also forces Java installation during the image build, even
+when `JAVA=false`. Keep `JAVA` for images that need Java without the full R
+development dependency set. For `r-base`, `R_BASE_MODE=dev` forces
+`R_DEV_DEPS=true`; for `rstudio`, `R_DEV_DEPS` follows the value you provide.
 
 `TEX` accepts `none`, `base`, `extra`, or `full`; the default is
 `none`.

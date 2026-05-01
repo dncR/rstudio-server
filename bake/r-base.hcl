@@ -92,7 +92,7 @@ target "r-base" {
     "DOCKER_HUB_REPO" = "${DOCKER_HUB_REPO}"
     "DEBIAN_FRONTEND" = "${DEBIAN_FRONTEND}"
     "R_BASE_MODE" = "${R_BASE_MODE}"
-    "R_DEV_DEPS" = "${R_DEV_DEPS}"
+    "R_DEV_DEPS" = R_BASE_MODE == "dev" ? "true" : "${R_DEV_DEPS}"
     "TEX" = "${TEX}"
     "JAVA" = "${JAVA}"
   }

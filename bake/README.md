@@ -48,8 +48,8 @@ see which modules were installed.
 
 | Argument | Default | Targets | Accepted values | Description |
 | --- | --- | --- | --- | --- |
-| `R_BASE_MODE` | `base` | `r-base` | `base`, `dev` | Controls whether optional modules are allowed in `r-base`. `base` ignores optional module args for `r-base`; `dev` allows selected modules to install. |
-| `R_DEV_DEPS` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs R package development system dependencies, `qpdf` and `ghostscript-x` for package checks, and preinstalls `devtools` and `BiocManager`. Also forces Java installation during the same image build. |
+| `R_BASE_MODE` | `base` | `r-base` | `base`, `dev` | Controls whether optional modules are allowed in `r-base`. `base` ignores optional module args for `r-base`; `dev` enables r-base development mode and forces `R_DEV_DEPS=true` for the `r-base` image. |
+| `R_DEV_DEPS` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs R package development system dependencies, `qpdf` and `ghostscript-x` for package checks, and preinstalls `devtools` and `BiocManager`. Also forces Java installation during the same image build. In `r-base`, `R_BASE_MODE=dev` forces this behavior even if `R_DEV_DEPS=false`. |
 | `TEX` | `none` | `r-base`, `rstudio` | `none`, `base`, `extra`, `full` | Controls TeX Live installation. `none` skips TeX, `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs Ubuntu's `texlive-full`. |
 | `JAVA` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs Java and runs `R CMD javareconf -e`. This is forced to `true` when `R_DEV_DEPS=true`. |
 | `SSH` | `false` | `rstudio` | `true`, `false` | Installs and configures OpenSSH Server under s6 supervision. This is only applied to the `rstudio` image. |
@@ -77,10 +77,12 @@ R_BASE_MODE=base R_DEV_DEPS=true TEX=full \
 docker buildx bake --file bake/image-builds.hcl r-base --push
 ```
 
-Use `R_BASE_MODE=dev` to allow selected optional modules in `r-base`:
+Use `R_BASE_MODE=dev` to enable r-base development mode. This always installs
+`R_DEV_DEPS` in `r-base`, even when `R_DEV_DEPS=false`; other module args such as
+`TEX` still depend on their own values:
 
 ```sh
-R_BASE_MODE=dev R_DEV_DEPS=true TEX=base \
+R_BASE_MODE=dev TEX=base \
 docker buildx bake --file bake/image-builds.hcl r-base --push
 ```
 
