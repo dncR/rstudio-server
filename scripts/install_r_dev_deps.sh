@@ -4,9 +4,9 @@ set -e
 
 . /rocker_scripts/build_metadata.sh
 
-INSTALL_R_DEV_DEPS=${INSTALL_R_DEV_DEPS:-false}
+R_DEV_DEPS=${R_DEV_DEPS:-false}
 
-if [ "$INSTALL_R_DEV_DEPS" = "true" ]; then
+if [ "$R_DEV_DEPS" = "true" ]; then
     metadata_init "${BUILD_IMAGE:-unknown}"
 
     if metadata_has_bool_module "r_dev_deps"; then
@@ -14,9 +14,10 @@ if [ "$INSTALL_R_DEV_DEPS" = "true" ]; then
         exit 0
     fi
 
-    echo "Installing R development system dependencies and R packages"
+    echo "Installing R development and R CMD check dependencies"
 
     apt-get update
+
     apt-get install -y --no-install-recommends \
         zlib1g-dev \
         nano \
@@ -35,11 +36,14 @@ if [ "$INSTALL_R_DEV_DEPS" = "true" ]; then
         libglpk-dev \
         libharfbuzz-dev \
         libfribidi-dev \
-        libgit2-dev
+        libgit2-dev \
+        qpdf \
+        ghostscript-x
+
     rm -rf /var/lib/apt/lists/*
 
     R -e "install.packages(c('devtools', 'BiocManager'), repos='https://cran.r-project.org')"
     metadata_set_module "r_dev_deps" "true"
 else
-    echo "Skipping R development dependencies (INSTALL_R_DEV_DEPS=$INSTALL_R_DEV_DEPS)"
+    echo "Skipping R development and R CMD check dependencies (R_DEV_DEPS=$R_DEV_DEPS)"
 fi

@@ -54,25 +54,24 @@ metadata_write() {
     local image="$1"
     local r_base_mode="$2"
     local r_dev_deps="$3"
-    local r_cmd_check_deps="$4"
-    local tex="$5"
-    local java="$6"
-    local ssh="$7"
+    local tex="$4"
+    local java="$5"
+    local ssh="$6"
     local r_version
     local ubuntu_version
     local default_user
     local rstudio_version
-    local tex_variant_requested
+    local tex_requested
     local r_version_json
     local ubuntu_version_json
     local default_user_json
     local rstudio_version_json
     local r_base_mode_json
-    local tex_variant_requested_json
+    local tex_requested_json
 
     r_version=${R_VERSION:-$(metadata_string "r_version")}
     ubuntu_version=${UBUNTU_VERSION:-$(metadata_string "ubuntu_version")}
-    tex_variant_requested=${TEX_VARIANT:-$(metadata_string "tex_variant")}
+    tex_requested=${TEX:-$(metadata_string "tex")}
 
     case "$image" in
         rstudio)
@@ -90,12 +89,12 @@ metadata_write() {
     default_user_json=$(metadata_json_string_or_null "$default_user")
     rstudio_version_json=$(metadata_json_string_or_null "$rstudio_version")
     r_base_mode_json=$(metadata_json_string_or_null "$r_base_mode")
-    tex_variant_requested_json=$(metadata_json_string_or_null "$tex_variant_requested")
+    tex_requested_json=$(metadata_json_string_or_null "$tex_requested")
 
     mkdir -p "$BUILD_METADATA_DIR"
     cat > "$BUILD_METADATA_FILE" <<EOF
 {
-  "schema_version": 2,
+  "schema_version": 4,
   "image": "$image",
   "r_version": $r_version_json,
   "ubuntu_version": $ubuntu_version_json,
@@ -103,11 +102,10 @@ metadata_write() {
   "rstudio_version": $rstudio_version_json,
   "r_base_mode": $r_base_mode_json,
   "requested": {
-    "tex_variant": $tex_variant_requested_json
+    "tex": $tex_requested_json
   },
   "modules": {
     "r_dev_deps": $r_dev_deps,
-    "r_cmd_check_deps": $r_cmd_check_deps,
     "tex": "$tex",
     "java": $java,
     "ssh": $ssh
@@ -120,14 +118,12 @@ metadata_init() {
     local image="${1:-unknown}"
     local current_mode
     local current_r_dev
-    local current_r_cmd
     local current_tex
     local current_java
     local current_ssh
 
     current_mode=$(metadata_string "r_base_mode")
     current_r_dev=$(metadata_module "r_dev_deps" "false")
-    current_r_cmd=$(metadata_module "r_cmd_check_deps" "false")
     current_tex=$(metadata_module "tex" "none")
     current_java=$(metadata_module "java" "false")
     current_ssh=$(metadata_module "ssh" "false")
@@ -147,7 +143,7 @@ metadata_init() {
             ;;
     esac
 
-    metadata_write "$image" "$current_mode" "$current_r_dev" "$current_r_cmd" "$current_tex" "$current_java" "$current_ssh"
+    metadata_write "$image" "$current_mode" "$current_r_dev" "$current_tex" "$current_java" "$current_ssh"
 }
 
 metadata_set_module() {
@@ -156,7 +152,6 @@ metadata_set_module() {
     local image
     local mode
     local r_dev
-    local r_cmd
     local tex
     local java
     local ssh
@@ -164,7 +159,6 @@ metadata_set_module() {
     image=$(metadata_string "image")
     mode=$(metadata_string "r_base_mode")
     r_dev=$(metadata_module "r_dev_deps" "false")
-    r_cmd=$(metadata_module "r_cmd_check_deps" "false")
     tex=$(metadata_module "tex" "none")
     java=$(metadata_module "java" "false")
     ssh=$(metadata_module "ssh" "false")
@@ -174,7 +168,6 @@ metadata_set_module() {
 
     case "$key" in
         r_dev_deps) r_dev=$(metadata_bool "$value") ;;
-        r_cmd_check_deps) r_cmd=$(metadata_bool "$value") ;;
         tex) tex="$value" ;;
         java) java=$(metadata_bool "$value") ;;
         ssh) ssh=$(metadata_bool "$value") ;;
@@ -184,7 +177,7 @@ metadata_set_module() {
             ;;
     esac
 
-    metadata_write "$image" "$mode" "$r_dev" "$r_cmd" "$tex" "$java" "$ssh"
+    metadata_write "$image" "$mode" "$r_dev" "$tex" "$java" "$ssh"
 }
 
 metadata_has_bool_module() {

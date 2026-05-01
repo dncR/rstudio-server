@@ -4,10 +4,10 @@ set -e
 
 . /rocker_scripts/build_metadata.sh
 
-INSTALL_SSH=${INSTALL_SSH:-false}
+SSH=${SSH:-false}
 DEFAULT_USER=${DEFAULT_USER:-rstudio}
 
-if [ "$INSTALL_SSH" = "true" ]; then
+if [ "$SSH" = "true" ]; then
     metadata_init "${BUILD_IMAGE:-unknown}"
 
     if metadata_has_bool_module "ssh"; then
@@ -37,5 +37,5 @@ EOF
     chmod 755 /etc/services.d/ssh/run
     metadata_set_module "ssh" "true"
 else
-    echo "Skipping OpenSSH server installation (INSTALL_SSH=$INSTALL_SSH)"
+    echo "Skipping OpenSSH server installation (SSH=$SSH)"
 fi

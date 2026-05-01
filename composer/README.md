@@ -91,12 +91,12 @@ docker compose --env-file .env -f rstudio.yml down
 
 ## SSH Access
 
-SSH access requires an image built with `INSTALL_SSH=true`. The Compose template
+SSH access requires an image built with `SSH=true`. The Compose template
 can map the port and key for SSH, but a minimal RStudio image does not install
 the OpenSSH server unless that build arg is enabled.
 
 The Compose file always includes the SSH port and public-key mount. If the image
-was not built with `INSTALL_SSH=true`, SSH connections to `SSH_PORT` will fail.
+was not built with `SSH=true`, SSH connections to `SSH_PORT` will fail.
 If `SSH_PUBLIC_KEY` does not point to an existing public key file, or if the path
 or filename is wrong, `docker compose up` can fail before the container starts.
 Verify both the image metadata and the key path before treating SSH as available.
@@ -131,13 +131,13 @@ README and `../bake/image-builds.hcl`.
 For a local image with SSH support:
 
 ```sh
-R_VERSION=4.6.0 UBUNTU_VERSION=noble INSTALL_SSH=true \
+R_VERSION=4.6.0 UBUNTU_VERSION=noble SSH=true \
 docker buildx bake --file ../bake/image-builds.hcl --set '*.platform=linux/arm64' --load rstudio
 ```
 
 Published tags encode the R and Ubuntu versions, not optional build modules.
 Check the image metadata to see which optional modules, build user, RStudio
-version, and requested TeX variant were included. Image-specific fields that do
+version, and requested TeX setting were included. Image-specific fields that do
 not apply are stored as JSON `null`; `requested` records build requests and
 `modules` records what is actually installed:
 
@@ -152,8 +152,8 @@ For image-level dependencies, prefer changing the Dockerfile or build scripts
 and rebuilding the image. For one-off runtime changes, set `ROOT=true` in
 `.env`, restart the container, and use `sudo` inside the RStudio session.
 
-If TeX was installed during image build with `TEX_VARIANT=base`,
-`TEX_VARIANT=extra`, or `TEX_VARIANT=full`, do not run post-install TeX setup
+If TeX was installed during image build with `TEX=base`, `TEX=extra`, or
+`TEX=full`, do not run post-install TeX setup
 again. Check availability first:
 
 ```sh

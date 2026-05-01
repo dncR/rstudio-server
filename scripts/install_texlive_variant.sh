@@ -4,11 +4,11 @@ set -e
 
 . /rocker_scripts/build_metadata.sh
 
-TEX_VARIANT=${TEX_VARIANT:-none}
+TEX=${TEX:-none}
 
-case "$TEX_VARIANT" in
+case "$TEX" in
     none)
-        echo "Skipping TeX installation (TEX_VARIANT=none)"
+        echo "Skipping TeX installation (TEX=none)"
         ;;
     base)
         metadata_init "${BUILD_IMAGE:-unknown}"
@@ -67,7 +67,7 @@ case "$TEX_VARIANT" in
         metadata_set_module "tex" "full"
         ;;
     *)
-        echo "Invalid TEX_VARIANT=$TEX_VARIANT. Use one of: none, base, extra, full." >&2
+        echo "Invalid TEX=$TEX. Use one of: none, base, extra, full." >&2
         exit 1
         ;;
 esac

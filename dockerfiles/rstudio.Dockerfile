@@ -6,11 +6,10 @@ FROM dncr/r-base:${R_VERSION:-latest}-${UBUNTU_VERSION:-noble}
 
 ARG RSTUDIO_VERSION
 ARG DEFAULT_USER=rstudio
-ARG INSTALL_R_DEV_DEPS
-ARG INSTALL_R_CMD_CHECK_DEPS
-ARG TEX_VARIANT
-ARG INSTALL_JAVA
-ARG INSTALL_SSH
+ARG R_DEV_DEPS
+ARG TEX
+ARG JAVA
+ARG SSH
 
 ENV S6_VERSION=v2.1.0.2
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2026.04.0+526}
@@ -46,15 +45,12 @@ WORKDIR /home/${DEFAULT_USER}/
 RUN /rocker_scripts/fix_r_site_library_permissions.sh
 
 # Optional Java installation and R Java configuration. This runs before R
-# package installation because INSTALL_R_DEV_DEPS=true forces Java on.
+# package installation because R_DEV_DEPS=true forces Java on.
 RUN BUILD_IMAGE=rstudio /rocker_scripts/install_java.sh
 
 # Optional R package development dependencies and preinstalled R packages.
 RUN BUILD_IMAGE=rstudio /rocker_scripts/install_r_dev_deps.sh && \
   /rocker_scripts/fix_r_site_library_permissions.sh
-
-# Optional Ubuntu packages required by R CMD check.
-RUN BUILD_IMAGE=rstudio /rocker_scripts/install_r_cmd_check_deps.sh
 
 # Optional TeX Live installation.
 RUN BUILD_IMAGE=rstudio /rocker_scripts/install_texlive_variant.sh
@@ -65,7 +61,7 @@ RUN BUILD_IMAGE=rstudio /rocker_scripts/install_ssh.sh
 # Set LANG from locale.
 RUN locale-gen ${LANG}
 
-# RStudio Server uses port 8787. SSH uses port 22 when INSTALL_SSH=true.
+# RStudio Server uses port 8787. SSH uses port 22 when SSH=true.
 EXPOSE 22 8787
 
 CMD ["/init"]

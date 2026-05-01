@@ -12,10 +12,9 @@ ARG CRAN
 ARG LANG
 ARG DEBIAN_FRONTEND
 ARG R_BASE_MODE
-ARG INSTALL_R_DEV_DEPS
-ARG INSTALL_R_CMD_CHECK_DEPS
-ARG TEX_VARIANT
-ARG INSTALL_JAVA
+ARG R_DEV_DEPS
+ARG TEX
+ARG JAVA
 
 # Import values of ARGs from ENVIRONMENT
 ENV R_VERSION=${R_VERSION:-latest}
@@ -70,12 +69,6 @@ RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
         /rocker_scripts/fix_r_site_library_permissions.sh; \
     else \
         echo "Skipping r-base optional modules because R_BASE_MODE=${R_BASE_MODE:-base}"; \
-    fi
-
-RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
-        BUILD_IMAGE=r-base /rocker_scripts/install_r_cmd_check_deps.sh; \
-    else \
-        echo "Skipping r-base R CMD check dependencies because R_BASE_MODE=${R_BASE_MODE:-base}"; \
     fi
 
 RUN if [ "${R_BASE_MODE:-base}" = "dev" ]; then \
