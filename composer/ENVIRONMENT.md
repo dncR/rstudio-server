@@ -76,6 +76,10 @@ Keep it `false` unless the session needs administrative package installation.
 `DISABLE_AUTH=true` disables RStudio authentication. Use this only in trusted,
 local, isolated environments.
 
+Boolean runtime values are case-insensitive for `true` and `false`; `1` and `0`
+are also accepted. For example, `ROOT=TRUE`, `ROOT=True`, `ROOT=TRuE`, and
+`ROOT=1` all enable passwordless sudo.
+
 ## Volumes
 
 `WORKDIR` is the host directory mounted into the container at
@@ -129,12 +133,18 @@ development dependency set. For `r-base`, `R_BASE_MODE=dev` forces
 `INSTALL_TEX` accepts `none`, `base`, `extra`, or `full`; the default is
 `none`.
 
+Boolean build values are case-insensitive for `true` and `false`; `1` and `0`
+are also accepted. This applies to `R_DEV_DEPS`, `INSTALL_JAVA`, and
+`INSTALL_SSH`. The build metadata is still canonical: `modules.json` always
+renders boolean fields as lowercase JSON `true` or `false`, regardless of
+whether the input was `TRUE`, `True`, `1`, or another accepted spelling.
+
 Image tags encode R and Ubuntu versions, not optional modules. Inspect
 `/usr/local/share/rstudio-server-build/modules.json` inside an image to see the
 actual optional module state, build user, RStudio version, and requested TeX
-setting. Image-specific fields that do not apply are stored as JSON `null`;
-`requested` records build requests and `modules` records what is actually
-installed.
+setting. `image_chain` identifies whether the image is `r-base` only or
+`r-base + rstudio`; `effective.modules` shows the final image state, and
+`components` keeps separate requested/installed records for each layer.
 
 See the root `README.md` for build examples.
 Run image build commands from the project root directory because the bake files

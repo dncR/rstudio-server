@@ -6,11 +6,15 @@ set -e
 
 INSTALL_SSH=${INSTALL_SSH:-false}
 DEFAULT_USER=${DEFAULT_USER:-rstudio}
+INSTALL_SSH=$(metadata_bool "$INSTALL_SSH")
 
 if [ "$INSTALL_SSH" = "true" ]; then
     metadata_init "${BUILD_IMAGE:-unknown}"
 
     if metadata_has_bool_module "ssh"; then
+        if [ "${BUILD_IMAGE:-unknown}" = "rstudio" ] && ! metadata_component_has_bool_module "rstudio" "ssh"; then
+            metadata_set_skipped_from_base "ssh" "true"
+        fi
         echo "Skipping OpenSSH server installation because modules.json already records ssh=true"
         exit 0
     fi

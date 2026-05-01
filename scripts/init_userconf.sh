@@ -1,6 +1,14 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+runtime_bool() {
+    case "${1:-false}" in
+        [Tt][Rr][Uu][Ee] | 1) echo "true" ;;
+        [Ff][Aa][Ll][Ss][Ee] | 0 | "") echo "false" ;;
+        *) echo "false" ;;
+    esac
+}
+
 ## Set defaults for environmental variables in case they are undefined
 DEFAULT_USER=${DEFAULT_USER:-rstudio}
 USER=${DEFAULT_USER}
@@ -14,7 +22,12 @@ RUNROOTLESS=${RUNROOTLESS:=auto}
 
 if [ "${RUNROOTLESS}" = "auto" ]; then
     RUNROOTLESS=$(grep 4294967295 /proc/self/uid_map >/dev/null && echo "false" || echo "true")
+else
+    RUNROOTLESS=$(runtime_bool "$RUNROOTLESS")
 fi
+
+ROOT=$(runtime_bool "$ROOT")
+DISABLE_AUTH=$(runtime_bool "${DISABLE_AUTH:-false}")
 
 USERHOME="/home/${USER}"
 
@@ -103,7 +116,7 @@ if [ "${RUNROOTLESS}" = "true" ]; then
     done
 fi
 
-if [[ ${DISABLE_AUTH,,} == "true" ]]; then
+if [ "$DISABLE_AUTH" = "true" ]; then
     cp /etc/rstudio/disable_auth_rserver.conf /etc/rstudio/rserver.conf
     echo "USER=$USER" >>/etc/environment
 fi
@@ -171,7 +184,7 @@ echo "$USER:$PASSWORD" | chpasswd
 # images where adduser is not installed.
 if [ "${RUNROOTLESS}" = "true" ]; then
     echo "No sudoers changes needed when running rootless"
-elif [[ ${ROOT,,} == "true" ]]; then
+elif [ "$ROOT" = "true" ]; then
     line='%sudo ALL=(ALL) NOPASSWD:ALL'
     sudoers_file='/etc/sudoers'
     usermod -aG sudo "$USER" && { grep -qxF "$line" "$sudoers_file" || echo "$line"  >> "$sudoers_file"; }

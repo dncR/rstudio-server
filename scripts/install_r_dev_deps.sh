@@ -5,11 +5,15 @@ set -e
 . /rocker_scripts/build_metadata.sh
 
 R_DEV_DEPS=${R_DEV_DEPS:-false}
+R_DEV_DEPS=$(metadata_bool "$R_DEV_DEPS")
 
 if [ "$R_DEV_DEPS" = "true" ]; then
     metadata_init "${BUILD_IMAGE:-unknown}"
 
     if metadata_has_bool_module "r_dev_deps"; then
+        if [ "${BUILD_IMAGE:-unknown}" = "rstudio" ] && ! metadata_component_has_bool_module "rstudio" "r_dev_deps"; then
+            metadata_set_skipped_from_base "r_dev_deps" "true"
+        fi
         echo "Skipping R development dependencies because modules.json already records r_dev_deps=true"
         exit 0
     fi

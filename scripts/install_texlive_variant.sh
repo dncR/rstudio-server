@@ -13,6 +13,9 @@ case "$INSTALL_TEX" in
     base)
         metadata_init "${BUILD_IMAGE:-unknown}"
         if metadata_tex_satisfies "base"; then
+            if [ "${BUILD_IMAGE:-unknown}" = "rstudio" ] && ! metadata_component_tex_satisfies "rstudio" "base"; then
+                metadata_set_skipped_from_base "tex" "true"
+            fi
             echo "Skipping base TeX Live installation because modules.json records tex=$(metadata_module "tex" "none")"
             exit 0
         fi
@@ -32,6 +35,9 @@ case "$INSTALL_TEX" in
     extra)
         metadata_init "${BUILD_IMAGE:-unknown}"
         if metadata_tex_satisfies "extra"; then
+            if [ "${BUILD_IMAGE:-unknown}" = "rstudio" ] && ! metadata_component_tex_satisfies "rstudio" "extra"; then
+                metadata_set_skipped_from_base "tex" "true"
+            fi
             echo "Skipping extra TeX Live installation because modules.json records tex=$(metadata_module "tex" "none")"
             exit 0
         fi
@@ -54,6 +60,9 @@ case "$INSTALL_TEX" in
     full)
         metadata_init "${BUILD_IMAGE:-unknown}"
         if metadata_tex_satisfies "full"; then
+            if [ "${BUILD_IMAGE:-unknown}" = "rstudio" ] && ! metadata_component_tex_satisfies "rstudio" "full"; then
+                metadata_set_skipped_from_base "tex" "true"
+            fi
             echo "Skipping full TeX Live installation because modules.json already records tex=full"
             exit 0
         fi

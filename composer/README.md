@@ -48,8 +48,13 @@ Important variables in `.env`:
 - `DEFAULT_USER`: RStudio login user. The default published images use `rstudio`.
 - `PASSWORD`: RStudio login password.
 - `ROOT`: set to `true` only if the runtime user needs passwordless sudo.
+- `DISABLE_AUTH`: set to `true` only for trusted, isolated environments.
 - `WORKDIR`: host directory mounted at `/home/${DEFAULT_USER}/externalvolume`.
 - `SSH_PUBLIC_KEY`: host public key mounted as `authorized_keys` for SSH access.
+
+Boolean runtime values are case-insensitive for `true` and `false`; `1` and `0`
+are also accepted. For example, `ROOT=TRUE`, `ROOT=True`, `ROOT=TRuE`, and
+`ROOT=1` all enable passwordless sudo.
 
 Do not use `USER` or `HOME` for Compose interpolation in this file. Those names
 are commonly exported by the host shell and can override `.env` values during
@@ -139,11 +144,17 @@ R_VERSION=4.6.0 UBUNTU_VERSION=noble INSTALL_SSH=true \
 docker buildx bake --file bake/image-builds.hcl --set '*.platform=linux/arm64' --load rstudio
 ```
 
+Boolean build args such as `R_DEV_DEPS`, `INSTALL_JAVA`, and `INSTALL_SSH` accept
+case-insensitive `true`/`false` and numeric `1`/`0`. The generated
+`modules.json` still stores boolean metadata as lowercase JSON `true` or
+`false`, regardless of the input style.
+
 Published tags encode the R and Ubuntu versions, not optional build modules.
 Check the image metadata to see which optional modules, build user, RStudio
-version, and requested TeX setting were included. Image-specific fields that do
-not apply are stored as JSON `null`; `requested` records build requests and
-`modules` records what is actually installed:
+version, and requested TeX setting were included. `image_chain` identifies
+whether the image is `r-base` only or `r-base + rstudio`; `effective.modules`
+shows the final image state, and `components` keeps separate requested/installed
+records for each layer:
 
 ```sh
 docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \

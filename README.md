@@ -143,7 +143,12 @@ For `bake/image-builds.hcl`, the extra args below control optional image customi
 See `bake/README.md` for the complete build argument reference.
 
 Boolean optional build args default to `false`, and `INSTALL_TEX` defaults to
-`none`. With `R_BASE_MODE=base`,
+`none`. Boolean values are case-insensitive for `true` and `false`, and `1`/`0`
+are accepted as aliases. For example, `R_DEV_DEPS=TRUE`, `R_DEV_DEPS=True`,
+`R_DEV_DEPS=TRuE`, and `R_DEV_DEPS=1` all enable the option. Metadata remains
+canonical: `/usr/local/share/rstudio-server-build/modules.json` always renders
+boolean values as lowercase JSON `true` or `false`, regardless of the input
+style. With `R_BASE_MODE=base`,
 the `r-base` image keeps only the base R environment even if optional module
 args are set. The `rstudio` image can still install selected optional modules
 on top of the inherited `r-base` image.
@@ -167,12 +172,13 @@ docker run --rm dncr/rstudio-server:${R_VERSION}-${UBUNTU_VERSION} \
   cat /usr/local/share/rstudio-server-build/modules.json
 ```
 
-The same metadata path is available in `dncr/r-base` images. Fields that do not
-apply to the image being built are stored as JSON `null`; for example,
-`default_user` and `rstudio_version` are `null` in `r-base` metadata and are
-written with real values when the `rstudio` image updates the metadata. The
-`requested` section records build requests, while `modules` records what is
-actually installed in the image.
+The same metadata path is available in `dncr/r-base` images. The
+`image_chain` field is `r-base` for base-only images and `r-base + rstudio` when
+the RStudio layer is added. `effective.modules` records the final image state,
+while `components.r_base` and `components.rstudio` keep separate `requested` and
+`modules` records for each layer. When RStudio skips a module because it was
+already available from `r-base`, that decision is recorded under
+`components.rstudio.skipped_from_base`.
 
 ### Step 6.2 (Optional): Use a `.env` file instead of typing variables every time
 
