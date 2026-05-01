@@ -105,13 +105,13 @@ R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/image-builds
 Build an RStudio image with optional development features:
 
 ```sh
-R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 R_DEV_DEPS=true TEX=base SSH=true docker buildx bake --file bake/image-builds.hcl --builder multiarch --push rstudio
+R_VERSION=4.4.3 UBUNTU_VERSION=noble RSTUDIO_VERSION=2026.04.0+526 R_DEV_DEPS=true INSTALL_TEX=base INSTALL_SSH=true docker buildx bake --file bake/image-builds.hcl --builder multiarch --push rstudio
 ```
 
 Build a CLI-first `r-base` development image with optional modules:
 
 ```sh
-R_VERSION=4.4.3 UBUNTU_VERSION=noble R_BASE_MODE=dev TEX=base docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
+R_VERSION=4.4.3 UBUNTU_VERSION=noble R_BASE_MODE=dev INSTALL_TEX=base docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
 ```
 
 Use `bake/image-builds.hcl` as the canonical build workflow. Its default group
@@ -128,21 +128,21 @@ workflow does not solve the local `r-base` target again:
 
 ```sh
 R_VERSION=4.4.3 UBUNTU_VERSION=noble docker buildx bake --file bake/r-base.hcl --builder multiarch --push r-base
-R_VERSION=4.4.3 UBUNTU_VERSION=noble SSH=true TEX=extra JAVA=true docker buildx bake --file bake/rstudio.hcl --builder multiarch --push rstudio
+R_VERSION=4.4.3 UBUNTU_VERSION=noble INSTALL_SSH=true INSTALL_TEX=extra INSTALL_JAVA=true docker buildx bake --file bake/rstudio.hcl --builder multiarch --push rstudio
 ```
 
 For `bake/image-builds.hcl`, the extra args below control optional image customizations:
 
 - `DEFAULT_USER=rstudio`: sets the Linux user created for the `rstudio` image. The default is defined as an image environment variable during build.
 - `R_BASE_MODE=base|dev`: controls whether optional modules are allowed in the `r-base` target. The default `base` ignores optional module args for `r-base`; `dev` enables r-base development mode and forces `R_DEV_DEPS=true` for the `r-base` image.
-- `R_DEV_DEPS=true`: installs R package development system dependencies, `qpdf` and `ghostscript-x` for R package checks, and preinstalls `devtools` and `BiocManager` using `scripts/install_r_dev_deps.sh`. This also forces Java installation, even when `JAVA=false`. In `r-base`, `R_BASE_MODE=dev` forces this behavior even if `R_DEV_DEPS=false`.
-- `TEX=none|base|extra|full`: controls TeX Live installation using `scripts/install_texlive_variant.sh`. The default is `none`; `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs the full Ubuntu TeX Live distribution.
-- `JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
-- `SSH=true`: installs and configures OpenSSH Server under s6 supervision for the `rstudio` image using `scripts/install_ssh.sh`.
+- `R_DEV_DEPS=true`: installs R package development system dependencies, `qpdf` and `ghostscript-x` for R package checks, and preinstalls `devtools` and `BiocManager` using `scripts/install_r_dev_deps.sh`. This also forces Java installation, even when `INSTALL_JAVA=false`. In `r-base`, `R_BASE_MODE=dev` forces this behavior even if `R_DEV_DEPS=false`.
+- `INSTALL_TEX=none|base|extra|full`: controls TeX Live installation using `scripts/install_texlive_variant.sh`. The default is `none`; `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs the full Ubuntu TeX Live distribution.
+- `INSTALL_JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
+- `INSTALL_SSH=true`: installs and configures OpenSSH Server under s6 supervision for the `rstudio` image using `scripts/install_ssh.sh`.
 
 See `bake/README.md` for the complete build argument reference.
 
-Boolean optional build args default to `false`, and `TEX` defaults to
+Boolean optional build args default to `false`, and `INSTALL_TEX` defaults to
 `none`. With `R_BASE_MODE=base`,
 the `r-base` image keeps only the base R environment even if optional module
 args are set. The `rstudio` image can still install selected optional modules

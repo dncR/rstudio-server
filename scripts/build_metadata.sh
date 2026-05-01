@@ -71,7 +71,7 @@ metadata_write() {
 
     r_version=${R_VERSION:-$(metadata_string "r_version")}
     ubuntu_version=${UBUNTU_VERSION:-$(metadata_string "ubuntu_version")}
-    tex_requested=${TEX:-$(metadata_string "tex")}
+    tex_requested=${INSTALL_TEX:-$(metadata_string "tex")}
 
     case "$image" in
         rstudio)

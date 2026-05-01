@@ -4,15 +4,15 @@ set -e
 
 . /rocker_scripts/build_metadata.sh
 
-JAVA=${JAVA:-false}
+INSTALL_JAVA=${INSTALL_JAVA:-false}
 R_DEV_DEPS=${R_DEV_DEPS:-false}
 
 if [ "$R_DEV_DEPS" = "true" ]; then
-    JAVA=true
+    INSTALL_JAVA=true
     echo "Enabling Java installation because R_DEV_DEPS=true"
 fi
 
-if [ "$JAVA" = "true" ]; then
+if [ "$INSTALL_JAVA" = "true" ]; then
     metadata_init "${BUILD_IMAGE:-unknown}"
 
     if metadata_has_bool_module "java"; then
@@ -31,5 +31,5 @@ if [ "$JAVA" = "true" ]; then
     R CMD javareconf -e
     metadata_set_module "java" "true"
 else
-    echo "Skipping Java installation (JAVA=$JAVA, R_DEV_DEPS=$R_DEV_DEPS)"
+    echo "Skipping Java installation (INSTALL_JAVA=$INSTALL_JAVA, R_DEV_DEPS=$R_DEV_DEPS)"
 fi

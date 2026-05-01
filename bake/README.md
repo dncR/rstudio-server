@@ -13,7 +13,7 @@ the relative paths before building.
 Example:
 
 ```sh
-R_VERSION=4.6.0 UBUNTU_VERSION=noble R_BASE_MODE=dev TEX=base \
+R_VERSION=4.6.0 UBUNTU_VERSION=noble R_BASE_MODE=dev INSTALL_TEX=base \
 docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
 ```
 
@@ -56,12 +56,12 @@ see which modules were installed.
 | --- | --- | --- | --- | --- |
 | `R_BASE_MODE` | `base` | `r-base` | `base`, `dev` | Controls whether optional modules are allowed in `r-base`. `base` ignores optional module args for `r-base`; `dev` enables r-base development mode and forces `R_DEV_DEPS=true` for the `r-base` image. |
 | `R_DEV_DEPS` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs R package development system dependencies, `qpdf` and `ghostscript-x` for package checks, and preinstalls `devtools` and `BiocManager`. Also forces Java installation during the same image build. In `r-base`, `R_BASE_MODE=dev` forces this behavior even if `R_DEV_DEPS=false`. |
-| `TEX` | `none` | `r-base`, `rstudio` | `none`, `base`, `extra`, `full` | Controls TeX Live installation. `none` skips TeX, `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs Ubuntu's `texlive-full`. |
-| `JAVA` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs Java and runs `R CMD javareconf -e`. This is forced to `true` when `R_DEV_DEPS=true`. |
-| `SSH` | `false` | `rstudio` | `true`, `false` | Installs and configures OpenSSH Server under s6 supervision. This is only applied to the `rstudio` image. |
+| `INSTALL_TEX` | `none` | `r-base`, `rstudio` | `none`, `base`, `extra`, `full` | Controls TeX Live installation. `none` skips TeX, `base` installs a smaller TeX set, `extra` adds broader LaTeX packages and utilities, and `full` installs Ubuntu's `texlive-full`. |
+| `INSTALL_JAVA` | `false` | `r-base`, `rstudio` | `true`, `false` | Installs Java and runs `R CMD javareconf -e`. This is forced to `true` when `R_DEV_DEPS=true`. |
+| `INSTALL_SSH` | `false` | `rstudio` | `true`, `false` | Installs and configures OpenSSH Server under s6 supervision. This is only applied to the `rstudio` image. |
 
 Shell environment variables are read by `docker buildx bake` before defaults in
-this file. If `DEFAULT_USER`, `TEX`, or another build argument is
+this file. If `DEFAULT_USER`, `INSTALL_TEX`, or another build argument is
 exported in your shell, that value overrides the HCL default. Check the active
 environment before debugging unexpected build output.
 
@@ -79,16 +79,16 @@ With `R_BASE_MODE=base`, optional module args are ignored for `r-base` even if
 they are set:
 
 ```sh
-R_BASE_MODE=base R_DEV_DEPS=true TEX=full \
+R_BASE_MODE=base R_DEV_DEPS=true INSTALL_TEX=full \
 docker buildx bake --file bake/image-builds.hcl r-base --push
 ```
 
 Use `R_BASE_MODE=dev` to enable r-base development mode. This always installs
 `R_DEV_DEPS` in `r-base`, even when `R_DEV_DEPS=false`; other module args such as
-`TEX` still depend on their own values:
+`INSTALL_TEX` still depend on their own values:
 
 ```sh
-R_BASE_MODE=dev TEX=base \
+R_BASE_MODE=dev INSTALL_TEX=base \
 docker buildx bake --file bake/image-builds.hcl r-base --push
 ```
 
@@ -99,7 +99,7 @@ When using `bake/image-builds.hcl`, the `rstudio` image inherits from the local
 optional modules on top of the inherited base image:
 
 ```sh
-SSH=true TEX=base \
+INSTALL_SSH=true INSTALL_TEX=base \
 docker buildx bake --file bake/image-builds.hcl rstudio --push
 ```
 

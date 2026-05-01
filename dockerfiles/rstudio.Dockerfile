@@ -7,9 +7,9 @@ FROM dncr/r-base:${R_VERSION:-latest}-${UBUNTU_VERSION:-noble}
 ARG RSTUDIO_VERSION
 ARG DEFAULT_USER=rstudio
 ARG R_DEV_DEPS
-ARG TEX
-ARG JAVA
-ARG SSH
+ARG INSTALL_TEX
+ARG INSTALL_JAVA
+ARG INSTALL_SSH
 
 ENV S6_VERSION=v2.1.0.2
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2026.04.0+526}
@@ -61,7 +61,7 @@ RUN BUILD_IMAGE=rstudio /rocker_scripts/install_ssh.sh
 # Set LANG from locale.
 RUN locale-gen ${LANG}
 
-# RStudio Server uses port 8787. SSH uses port 22 when SSH=true.
+# RStudio Server uses port 8787. SSH uses port 22 when INSTALL_SSH=true.
 EXPOSE 22 8787
 
 CMD ["/init"]

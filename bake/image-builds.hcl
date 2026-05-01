@@ -50,15 +50,15 @@ variable "R_DEV_DEPS" {
   default = "false"
 }
 
-variable "TEX" {
+variable "INSTALL_TEX" {
   default = "none"
 }
 
-variable "JAVA" {
+variable "INSTALL_JAVA" {
   default = "false"
 }
 
-variable "SSH" {
+variable "INSTALL_SSH" {
   default = "false"
 }
 
@@ -105,8 +105,8 @@ target "r-base" {
     "DEBIAN_FRONTEND" = "${DEBIAN_FRONTEND}"
     "R_BASE_MODE" = "${R_BASE_MODE}"
     "R_DEV_DEPS" = R_BASE_MODE == "dev" ? "true" : "${R_DEV_DEPS}"
-    "TEX" = "${TEX}"
-    "JAVA" = "${JAVA}"
+    "INSTALL_TEX" = "${INSTALL_TEX}"
+    "INSTALL_JAVA" = "${INSTALL_JAVA}"
   }
 }
 
@@ -157,8 +157,8 @@ target "rstudio" {
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "R_DEV_DEPS" = "${R_DEV_DEPS}"
-    "TEX" = "${TEX}"
-    "JAVA" = "${JAVA}"
-    "SSH" = "${SSH}"
+    "INSTALL_TEX" = "${INSTALL_TEX}"
+    "INSTALL_JAVA" = "${INSTALL_JAVA}"
+    "INSTALL_SSH" = "${INSTALL_SSH}"
   }
 }

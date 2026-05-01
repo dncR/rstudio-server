@@ -48,7 +48,7 @@ must be reachable from other machines on the network.
 `PORT` maps the host port to RStudio Server's container port `8787`.
 
 `SSH_PORT` maps the host port to the container SSH port `22`. This only works
-when the image was built with `SSH=true`.
+when the image was built with `INSTALL_SSH=true`.
 
 ## Runtime User
 
@@ -84,11 +84,11 @@ Compose relative to the compose file location.
 
 `SSH_PUBLIC_KEY` must point to an existing public key file on the host. It is
 mounted read-only as `/home/${DEFAULT_USER}/.ssh/authorized_keys`. SSH access also
-requires an image built with `SSH=true`.
+requires an image built with `INSTALL_SSH=true`.
 
 Because the Compose template always declares the SSH key mount, an invalid
 `SSH_PUBLIC_KEY` path can interrupt `docker compose up`. Confirm that
-`SSH=true` was used for the image and that the key path and filename are
+`INSTALL_SSH=true` was used for the image and that the key path and filename are
 correct before connecting over SSH.
 
 ## Restart Policy
@@ -106,15 +106,15 @@ the bake files under `bake/`:
 ```text
 R_BASE_MODE
 R_DEV_DEPS
-TEX
-JAVA
-SSH
+INSTALL_TEX
+INSTALL_JAVA
+INSTALL_SSH
 ```
 
 `R_BASE_MODE=base` keeps `r-base` minimal and ignores optional module args for
 that target. `R_BASE_MODE=dev` enables r-base development mode and forces
 `R_DEV_DEPS=true` inside the `r-base` image, even if `R_DEV_DEPS=false` was
-provided. Other module args such as `TEX` still depend on their own values. The
+provided. Other module args such as `INSTALL_TEX` still depend on their own values. The
 `rstudio` target can install selected modules on top of the inherited `r-base`
 image and skips modules already recorded in metadata.
 
@@ -123,11 +123,10 @@ Use `bake/image-builds.hcl` for the chained workflow. Use `bake/r-base.hcl` and
 `rstudio` from the published `dncr/r-base:${R_VERSION}-${UBUNTU_VERSION}` image.
 
 `R_DEV_DEPS=true` also forces Java installation during the image build, even
-when `JAVA=false`. Keep `JAVA` for images that need Java without the full R
+when `INSTALL_JAVA=false`. Keep `INSTALL_JAVA` for images that need Java without the full R
 development dependency set. For `r-base`, `R_BASE_MODE=dev` forces
 `R_DEV_DEPS=true`; for `rstudio`, `R_DEV_DEPS` follows the value you provide.
-
-`TEX` accepts `none`, `base`, `extra`, or `full`; the default is
+`INSTALL_TEX` accepts `none`, `base`, `extra`, or `full`; the default is
 `none`.
 
 Image tags encode R and Ubuntu versions, not optional modules. Inspect
