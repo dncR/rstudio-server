@@ -50,6 +50,10 @@ variable "CACHE_REMOTE" {
   default = "false"
 }
 
+variable "CACHE_MODE" {
+  default = "min"
+}
+
 target "rstudio" {
   context = "."
   dockerfile = "dockerfiles/rstudio.Dockerfile"
@@ -69,7 +73,7 @@ target "rstudio" {
     {
       type = "registry",
       ref = "docker.io/${RSTUDIO_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}",
-      mode = "max"
+      mode = "${CACHE_MODE}"
     }
   ] : []
 

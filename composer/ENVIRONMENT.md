@@ -123,6 +123,7 @@ INSTALL_TEX
 INSTALL_JAVA
 INSTALL_SSH
 CACHE_REMOTE
+CACHE_MODE
 UBUNTU_IMAGE_REPO
 R_BASE_IMAGE_REPO
 RSTUDIO_IMAGE_REPO
@@ -169,6 +170,14 @@ publishes the final image tag to a registry. `--load` loads a single-platform
 final image into the local Docker image store. `CACHE_REMOTE=true` enables
 registry cache import/export through `cache-*` tags; `CACHE_REMOTE=false` is the
 default and avoids writing those cache tags.
+
+`CACHE_MODE` controls registry cache export mode only when `CACHE_REMOTE=true`.
+The default is `min`, which exports a smaller registry cache and is less likely
+to fail during cache push. `CACHE_MODE=max` exports the broadest cache data, but
+it can trigger registry errors such as Docker Hub `400 Bad Request` responses
+during large cache blob uploads. In `bake/image-builds.hcl`, one `CACHE_MODE`
+value applies to all targets; in the separate `bake/r-base.hcl` and
+`bake/rstudio.hcl` workflows, each build can use a different value.
 
 Image tags encode R and Ubuntu versions, not optional modules. Inspect
 `/usr/local/share/rstudio-server-build/modules.json` inside an image to see the

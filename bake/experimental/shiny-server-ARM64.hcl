@@ -34,6 +34,10 @@ variable "SHINY_SERVER_VERSION" {
   default = "latest"
 }
 
+variable "CACHE_MODE" {
+  default = "min"
+}
+
 target "shiny-server" {
   context = "../../"
   
@@ -54,13 +58,13 @@ target "shiny-server" {
     {
       type = "registry",
       ref = "docker.io/dncr/shiny-server:cache-${R_VERSION}-${UBUNTU_VERSION}",
-      mode = "max"
+      mode = "${CACHE_MODE}"
     },
     
     {
       type = "local",
       dest = "/tmp/docker/cache/shiny-server-${R_VERSION}-${UBUNTU_VERSION}",
-      mode = "max"
+      mode = "${CACHE_MODE}"
     }
   ]
 

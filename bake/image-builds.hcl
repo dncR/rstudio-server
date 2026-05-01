@@ -74,6 +74,10 @@ variable "CACHE_REMOTE" {
   default = "false"
 }
 
+variable "CACHE_MODE" {
+  default = "min"
+}
+
 target "r-base" {
   context = "."
   dockerfile = "dockerfiles/r-base.Dockerfile"
@@ -93,7 +97,7 @@ target "r-base" {
     {
       type = "registry",
       ref = "docker.io/${R_BASE_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}",
-      mode = "max"
+      mode = "${CACHE_MODE}"
     }
   ] : []
 
@@ -147,7 +151,7 @@ target "rstudio" {
     {
       type = "registry",
       ref = "docker.io/${RSTUDIO_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}",
-      mode = "max"
+      mode = "${CACHE_MODE}"
     }
   ] : []
 

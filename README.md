@@ -149,6 +149,7 @@ For `bake/image-builds.hcl`, the extra args below control optional image customi
 - `INSTALL_JAVA=true`: installs Java and runs `R CMD javareconf -e` using `scripts/install_java.sh`. This arg remains available for minimal images that need Java without the full R development dependency set.
 - `INSTALL_SSH=true`: installs and configures OpenSSH Server under s6 supervision for the `rstudio` image using `scripts/install_ssh.sh`.
 - `CACHE_REMOTE=true`: enables registry cache import/export. The default is `false`, which avoids reading or writing `cache-*` tags.
+- `CACHE_MODE=min`: registry cache export mode used when `CACHE_REMOTE=true`. `min` is the default because `CACHE_MODE=max` can trigger registry cache push failures such as Docker Hub `400 Bad Request` responses during large cache blob uploads.
 
 See `bake/README.md` for the complete build argument reference.
 

@@ -48,6 +48,7 @@ separate files when you want to build and push `r-base` first, then build
 | `RSTUDIO_VERSION` | `2026.04.0+526` | `rstudio` | `stable`, `preview`, `daily`, `latest`, or a Posit/RStudio Server version | RStudio Server version installed by `scripts/install_rstudio.sh`. |
 | `DEFAULT_USER` | `rstudio` | `rstudio` | Linux username | Linux user created by `scripts/default_user.sh` for RStudio login and home-directory setup. Keep Compose `DEFAULT_USER` aligned with this value for custom images. |
 | `CACHE_REMOTE` | `false` | `r-base`, `rstudio` | `true`, `false`, `1`, `0` | Enables registry cache import/export through `cache-*` tags. It does not control final image output. |
+| `CACHE_MODE` | `min` | `r-base`, `rstudio` | `min`, `max` | Registry cache export mode used only when `CACHE_REMOTE=true`. In `bake/image-builds.hcl`, one value applies to all targets; in `bake/r-base.hcl` and `bake/rstudio.hcl`, each separate build can use its own value. |
 
 ## Optional Module Arguments
 
@@ -82,10 +83,16 @@ as lowercase JSON `true` or `false`.
   `${RSTUDIO_IMAGE_REPO}:cache-${R_VERSION}-${UBUNTU_VERSION}`.
 - `CACHE_REMOTE=false` is the default and disables remote registry cache. BuildKit
   can still use its local builder cache.
+- `CACHE_MODE=min` exports a smaller registry cache and is the default because
+  it is less likely to fail during registry cache push.
+- `CACHE_MODE=max` exports the broadest cache data, but it can trigger registry
+  failures such as Docker Hub `400 Bad Request` responses during large cache
+  blob uploads.
 
 `CACHE_REMOTE` does not push the final image by itself. Conversely, `--load` can
 still write registry cache when `CACHE_REMOTE=true`; with the default
 `CACHE_REMOTE=false`, `--load` does not write the configured registry cache refs.
+`CACHE_MODE` has no effect unless `CACHE_REMOTE=true`.
 
 Shell environment variables are read by `docker buildx bake` before defaults in
 this file. If `DEFAULT_USER`, `INSTALL_TEX`, or another build argument is

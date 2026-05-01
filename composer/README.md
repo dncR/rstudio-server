@@ -160,6 +160,10 @@ the input style.
 `--push` publishes the final image tag to a registry. `--load` loads a
 single-platform final image into the local Docker image store. Registry cache is
 separate from both and is controlled by `CACHE_REMOTE`.
+When remote cache is enabled, `CACHE_MODE=min` is the default because it exports
+a smaller cache and is less likely to fail during registry cache push.
+`CACHE_MODE=max` exports broader cache data, but it can trigger registry errors
+such as Docker Hub `400 Bad Request` responses during large cache blob uploads.
 
 Published tags encode the R and Ubuntu versions, not optional build modules.
 Check the image metadata to see which optional modules, build user, RStudio
