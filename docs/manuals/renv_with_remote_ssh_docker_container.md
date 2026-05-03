@@ -1,81 +1,81 @@
-# SSH Remote Docker: R ve renv Notlari
+# SSH Remote Docker: R and renv Notes
 
-Bu not, local makinede calisan bir Docker container'a SSH ile baglanip VS Code / Antigravity uzerinden R kullanirken `renv` ve VS Code R entegrasyonu arasindaki startup zincirini netlestirmek icin hazirlandi.
+These notes explain the startup chain between `renv` and the VS Code R integration when connecting over SSH to a Docker container running on a local machine and using R through VS Code / Antigravity.
 
-Bu dokumanin amaci iki seyi ayirmaktir:
+The purpose of this document is to separate two different topics:
 
-- `renv` kutuphane / lockfile problemleri
-- VS Code R session attach / `.vsc.attach()` problemleri
+- `renv` library / lockfile problems
+- VS Code R session attach / `.vsc.attach()` problems
 
-Bu iki konu bazen ayni anda gorunur, ama ayni problem degildir.
+These two issues can appear at the same time, but they are not the same problem.
 
-## Hedef Senaryo
+## Target Scenario
 
-- Host: local makine
+- Host: local machine
 - Remote: Docker container
-- Baglanti: SSH Remote
+- Connection: SSH Remote
 - Editor: VS Code / Antigravity
-- R kullanim tipi:
-  - normal R klasoru
-  - `renv` kullanan proje klasoru
+- R usage type:
+  - regular R folder
+  - project folder using `renv`
 
-## Ana Problem
+## Main Problem
 
-VS Code R entegrasyonu icin gereken `.vsc.attach()` gibi yardimci fonksiyonlar sadece uygun startup zinciri calisinca olusur.
+Helper functions required by the VS Code R integration, such as `.vsc.attach()`, are created only when the correct startup chain runs.
 
-Tipik hata:
+Typical error:
 
 ```r
 .vsc.attach()
 Error in .vsc.attach() : could not find function ".vsc.attach"
 ```
 
-Bu hata genelde su nedenlerden biriyle olur:
+This error usually happens for one of these reasons:
 
-- R oturumu VS Code terminali disinda acilmistir
-- `~/.Rprofile` hic yuklenmemistir
-- proje kokundeki `.Rprofile`, home altindaki `~/.Rprofile` dosyasini golgelemistir
-- `renv` proje startup akisi editor init zincirini eksik birakmistir
+- the R session was opened outside the VS Code terminal
+- `~/.Rprofile` was not loaded at all
+- the project-root `.Rprofile` shadowed the home `~/.Rprofile`
+- the `renv` project startup flow left the editor init chain incomplete
 
-## Teshis Sonucu: Gercek Fark Nedir?
+## Diagnostic Result: What Is the Real Difference?
 
-Bu senaryoda temel fark dogrudan `macOS` ile `Ubuntu` farki degildir. Asil fark, R oturumunun hangi startup zinciriyle acildigidir.
+In this scenario, the main difference is not directly the difference between `macOS` and `Ubuntu`. The real difference is which startup chain opened the R session.
 
-Teshiste netlesen noktalar:
+The diagnostic findings are:
 
-- proje kokundeki `.Rprofile` sadece `source("renv/activate.R")` iceriyorsa, home `~/.Rprofile` cogu durumda otomatik olarak calismaz
-- `renv/activate.R`, autoloader aktifken user profile'i ayrica source etmez
-- home `~/.Rprofile`, `~/.vscode-R/init.R` dosyasini source eder
-- bu init zinciri bazen `.vsc.attach` fonksiyonunu dogrudan olusturmaz; bunun yerine `.First.sys()` hook'unu hazirlar
-- sizin home `~/.Rprofile` dosyaniz, gerekirse `try(.First.sys(), silent = TRUE)` fallback'i ile attach zincirini tamamlar
-- proje `.Rprofile` home `~/.Rprofile` dosyasini source etmediginde bu fallback hic devreye girmez
+- if the project-root `.Rprofile` contains only `source("renv/activate.R")`, the home `~/.Rprofile` usually does not run automatically
+- `renv/activate.R` does not separately source the user profile while the autoloader is active
+- the home `~/.Rprofile` sources `~/.vscode-R/init.R`
+- this init chain sometimes does not directly create the `.vsc.attach` function; instead, it prepares the `.First.sys()` hook
+- your home `~/.Rprofile` completes the attach chain when needed with the `try(.First.sys(), silent = TRUE)` fallback
+- when the project `.Rprofile` does not source the home `~/.Rprofile`, this fallback never runs
 
-Kisa sonuc:
+Short conclusion:
 
-- plain `renv` startup zinciri tek basina her zaman yeterli degildir
-- home `~/.Rprofile` icindeki VS Code bootstrap ve fallback mantigi, remote container senaryosunda kritik rol oynar
-- bu nedenle `renv` projesi icindeki `.Rprofile` dosyasinin home `~/.Rprofile` dosyasini kosullu olarak source etmesi pratik ve guvenli cozumdur
+- the plain `renv` startup chain alone is not always sufficient
+- the VS Code bootstrap and fallback logic inside the home `~/.Rprofile` plays a critical role in the remote container scenario
+- therefore, conditionally sourcing the home `~/.Rprofile` from the `.Rprofile` inside the `renv` project is a practical and safe solution
 
-## `.Rprofile` Yukleme Sirasi Hakkinda Onemli Not
+## Important Note About `.Rprofile` Loading Order
 
-Beklenen ama yanlis olan varsayim:
+A common but incorrect assumption is:
 
-1. once `~/.Rprofile`
-2. sonra proje dizinindeki `.Rprofile`
+1. first `~/.Rprofile`
+2. then the `.Rprofile` in the project directory
 
-Pratikte proje kokunde `.Rprofile` varsa, startup davranisi bu varsayim kadar basit degildir. `renv` projelerinde cogu zaman proje `.Rprofile` dosyasi aktif zinciri fiilen devralir ve home `~/.Rprofile` otomatik olarak islenmeyebilir.
+In practice, if there is an `.Rprofile` in the project root, startup behavior is not this simple. In `renv` projects, the project `.Rprofile` often effectively takes over the active startup chain, and the home `~/.Rprofile` may not be processed automatically.
 
-Bu nedenle su dosya:
+Therefore, if this file:
 
 ```r
 source("renv/activate.R")
 ```
 
-tek basina kullaniliyorsa, home altindaki VS Code startup ayarlari hic devreye girmeyebilir.
+is used by itself, the VS Code startup settings under the home directory may never run.
 
-## Home Dizin Icin Onerilen `~/.Rprofile`
+## Recommended `~/.Rprofile` for the Home Directory
 
-Bu varyant, SSH remote + Docker + VS Code / Antigravity senaryosu icin guvenli baslangic ayaridir:
+This variant is a safe startup configuration for the SSH remote + Docker + VS Code / Antigravity scenario:
 
 ```r
 term_program <- tolower(Sys.getenv("TERM_PROGRAM", unset = ""))
@@ -97,54 +97,54 @@ if (interactive() && is_vscode && !is_positron && !is_rstudio) {
 }
 ```
 
-### Bu blogun mantigi
+### Logic of This Block
 
-- sadece interaktif R oturumlarinda calisir
-- sadece VS Code terminalinde devreye girer
-- RStudio icinde devreye girmez
-- Positron icinde devreye girmez
-- `~/.vscode-R/init.R` zincirini yukler
-- uzak/container oturumlarinda eksik kalabilen attach hook'unu fallback ile tamamlar
+- it runs only in interactive R sessions
+- it runs only in the VS Code terminal
+- it does not run inside RStudio
+- it does not run inside Positron
+- it loads the `~/.vscode-R/init.R` chain
+- it completes the attach hook with a fallback when that hook is incomplete in remote/container sessions
 
-## Normal R Klasoru Senaryosu
+## Regular R Folder Scenario
 
-Eger proje `renv` icermiyorsa:
+If the project does not contain `renv`:
 
-- `~/.Rprofile` genelde yeterlidir
-- R terminalini VS Code icinden acin
-- `R --vanilla` kullanmayin
+- `~/.Rprofile` is usually enough
+- open the R terminal from inside VS Code
+- do not use `R --vanilla`
 
-Kontrol:
+Check:
 
 ```r
 exists(".vsc.attach")
 search()
 ```
 
-Beklenen:
+Expected:
 
 - `exists(".vsc.attach")` -> `TRUE`
-- `search()` icinde `tools:vscode`
+- `tools:vscode` appears in `search()`
 
-## `renv` Projesi Senaryosu
+## `renv` Project Scenario
 
-`renv` projelerinde genelde proje kokunde `.Rprofile` bulunur. Bu dosya cogu zaman sadece asagidaki satiri icerir:
+In `renv` projects, there is usually an `.Rprofile` in the project root. This file often contains only the following line:
 
 ```r
 source("renv/activate.R")
 ```
 
-Bu tek basina yeterli degildir; cunku:
+This is not sufficient by itself, because:
 
-- `renv` aktif olur
-- proje library path'leri kurulur
-- ama home `~/.Rprofile` dosyasindaki VS Code bootstrap zinciri ve `.First.sys()` fallback'i hic calismayabilir
+- `renv` becomes active
+- project library paths are configured
+- but the VS Code bootstrap chain and `.First.sys()` fallback in the home `~/.Rprofile` may never run
 
-## Onerilen Proje `.Rprofile`
+## Recommended Project `.Rprofile`
 
-En guvenli pratik cozum, proje `.Rprofile` dosyasina `renv` aktivasyonundan sonra home `~/.Rprofile` dosyasini kosullu olarak source etmektir.
+The safest practical solution is to conditionally source the home `~/.Rprofile` from the project `.Rprofile` after activating `renv`.
 
-Onerilen varyant:
+Recommended variant:
 
 ```r
 source("renv/activate.R")
@@ -159,9 +159,9 @@ if (interactive() && is_vscode && !is_positron && !is_rstudio && file.exists("~/
 }
 ```
 
-### Neden kosullu blok tercih edilmeli?
+### Why Prefer the Conditional Block?
 
-Kosulsuz:
+An unconditional variant:
 
 ```r
 if (file.exists("~/.Rprofile")) {
@@ -169,84 +169,84 @@ if (file.exists("~/.Rprofile")) {
 }
 ```
 
-bircok durumda calisir; ancak bu daha genis etki alanina sahiptir.
+works in many cases, but it has a broader impact.
 
-Kosullu blok daha iyidir; cunku:
+The conditional block is better because:
 
-- sadece interaktif oturumlarda calisir
-- sadece `TERM_PROGRAM == "vscode"` oldugunda devreye girer
-- RStudio / Positron / batch / `Rscript` / CI gibi baska akislara gereksiz yan etki tasimaz
-- proje `renv` ayarini editor bootstrap mantigindan ayirmaya yardimci olur
+- it runs only in interactive sessions
+- it runs only when `TERM_PROGRAM == "vscode"`
+- it avoids unnecessary side effects in other flows such as RStudio / Positron / batch / `Rscript` / CI
+- it helps separate the project `renv` configuration from editor bootstrap logic
 
-Kisa karar:
+Short decision:
 
-- yalnizca size ait, sadece VS Code icin kullanilan kapali remote container kurgusunda kosulsuz varyant da kabul edilebilir
-- genel ve tekrar kullanilabilir standart icin kosullu blok tercih edilmelidir
+- in a closed remote container setup that belongs only to you and is used only for VS Code, the unconditional variant can also be acceptable
+- for a general and reusable standard, prefer the conditional block
 
-## Neden Sira `renv` Sonra `~/.Rprofile` Olmali?
+## Why Should the Order Be `renv` Then `~/.Rprofile`?
 
-Onerilen sira:
+Recommended order:
 
-1. once `renv` proje kutuphane ortamini kurar
-2. sonra VS Code / Antigravity entegrasyonu yuklenir
-3. gerekiyorsa home `~/.Rprofile` icindeki `.First.sys()` fallback'i attach zincirini tamamlar
+1. first, `renv` sets up the project library environment
+2. then the VS Code / Antigravity integration is loaded
+3. when needed, the `.First.sys()` fallback inside the home `~/.Rprofile` completes the attach chain
 
-Bu siralama sayesinde:
+With this order:
 
-- proje kutuphaneleri aktif olur
-- editor watcher gerekli fonksiyonlari gorebilir
-- hem `renv` hem editor entegrasyonu ayni oturumda calisir
+- project libraries become active
+- the editor watcher can see the required functions
+- both `renv` and the editor integration work in the same session
 
-## `RENV_CONFIG_EXTERNAL_LIBRARIES` Notu
+## `RENV_CONFIG_EXTERNAL_LIBRARIES` Note
 
-Bu senaryoda asagidaki ayar faydalidir:
-
-```text
-RENV_CONFIG_EXTERNAL_LIBRARIES=/usr/local/lib/R/site-library
-```
-
-Ornek olarak `~/.Renviron` icinde:
+The following setting is useful in this scenario:
 
 ```text
 RENV_CONFIG_EXTERNAL_LIBRARIES=/usr/local/lib/R/site-library
 ```
 
-Bu ayarin amaci:
+For example, inside `~/.Renviron`:
 
-- `renv` altinda iken site-library paketlerini gorunur kilmak
-- `jsonlite`, `rlang`, `httpgd` gibi editor zincirinin veya yardimci araclarin ihtiyac duyabilecegi paketlere erisimi kolaylastirmak
+```text
+RENV_CONFIG_EXTERNAL_LIBRARIES=/usr/local/lib/R/site-library
+```
 
-Ama bu ayar sunu garanti etmez:
+The purpose of this setting is to:
 
-- `~/.Rprofile` dosyasinin calismasi
-- `~/.vscode-R/init.R` zincirinin source edilmesi
-- `.vsc.attach()` fonksiyonunun otomatik olusmasi
+- make site-library packages visible while under `renv`
+- make it easier to access packages such as `jsonlite`, `rlang`, and `httpgd` that may be needed by the editor chain or helper tools
 
-Yani bu degisken package visibility problemini azaltir; startup zinciri problemini tek basina cozmez.
+But this setting does not guarantee:
 
-## `renv` Uyarisi ve `.vsc.attach()` Hatasi Ayni Sey Degil
+- that `~/.Rprofile` runs
+- that the `~/.vscode-R/init.R` chain is sourced
+- that the `.vsc.attach()` function is created automatically
 
-Sunun gibi bir mesaj:
+In other words, this variable reduces package visibility problems; by itself, it does not solve startup chain problems.
+
+## The `renv` Warning and the `.vsc.attach()` Error Are Not the Same Thing
+
+A message like this:
 
 ```text
 One or more packages recorded in the lockfile are not installed.
 Use `renv::status()` for more details.
 ```
 
-ayri bir problemdir. Bu, lockfile ile kurulu paketlerin uyusmadigini soyler.
+is a separate problem. It means the lockfile and installed packages do not match.
 
-Bu mesaj su hatanin dogrudan sebebi degildir:
+This message is not the direct cause of this error:
 
 ```r
 .vsc.attach()
 Error in .vsc.attach() : could not find function ".vsc.attach"
 ```
 
-Ilki `renv` durum bilgisidir, ikincisi startup / editor entegrasyonu problemidir.
+The first is `renv` status information; the second is a startup / editor integration problem.
 
-## Hizli Teshis Akisi
+## Quick Diagnostic Flow
 
-R icinde asagidaki kontrolleri yapin:
+Run the following checks inside R:
 
 ```r
 interactive()
@@ -262,100 +262,100 @@ requireNamespace("jsonlite", quietly = TRUE)
 requireNamespace("rlang", quietly = TRUE)
 ```
 
-Yorum:
+Interpretation:
 
-- `interactive()` -> `TRUE` olmali
-- `TERM_PROGRAM == "vscode"` olmali
-- `exists(".vsc.attach")` -> `TRUE` olmali
-- `search()` icinde `tools:vscode` gorunmeli
-- `jsonlite` ve `rlang` gorunur olmali
+- `interactive()` should be `TRUE`
+- `TERM_PROGRAM == "vscode"` should be true
+- `exists(".vsc.attach")` should be `TRUE`
+- `tools:vscode` should appear in `search()`
+- `jsonlite` and `rlang` should be visible
 
-Eger:
+If:
 
-- `TERM_PROGRAM == "vscode"` dogru
-- `jsonlite` ve `rlang` gorunur
-- ama `.vsc.attach == FALSE`
+- `TERM_PROGRAM == "vscode"` is correct
+- `jsonlite` and `rlang` are visible
+- but `.vsc.attach == FALSE`
 
-ise sorun buyuk ihtimalle package eksikligi degil, startup zincirinin eksik kalmasidir.
+then the problem is most likely not a missing package, but an incomplete startup chain.
 
-## Tipik Davranis Kombinasyonlari
+## Typical Behavior Combinations
 
-### Durum 1: Normal klasor + `~/.Rprofile`
+### Case 1: Regular Folder + `~/.Rprofile`
 
-Beklenen:
+Expected:
 
-- `tools:vscode` attach olur
-- `.vsc.attach` bulunur
+- `tools:vscode` is attached
+- `.vsc.attach` is found
 
-### Durum 2: `renv` proje + sadece `source("renv/activate.R")`
+### Case 2: `renv` Project + Only `source("renv/activate.R")`
 
-Beklenen risk:
+Expected risk:
 
-- `renv` aktif olur
-- `renv:shims` gorunur
-- ama `.vsc.attach` olmayabilir
+- `renv` becomes active
+- `renv:shims` appears
+- but `.vsc.attach` may be missing
 
-### Durum 3: `renv` proje + kosullu `source("~/.Rprofile")`
+### Case 3: `renv` Project + Conditional `source("~/.Rprofile")`
 
-Beklenen sonuc:
+Expected result:
 
-- `renv` aktif olur
-- home profile zinciri calisir
-- gerekiyorsa `.First.sys()` fallback'i attach'i tamamlar
-- `tools:vscode` gorunur
+- `renv` becomes active
+- the home profile chain runs
+- when needed, the `.First.sys()` fallback completes the attach
+- `tools:vscode` appears
 
-## `renv` Problemlerini Duzeltme
+## Fixing `renv` Problems
 
-R icinde:
+Inside R:
 
 ```r
 renv::status()
 renv::restore()
 ```
 
-Gerekirse:
+If needed:
 
 ```r
 renv::diagnostics()
 renv::repair()
 ```
 
-Not:
+Note:
 
-- `renv::restore()` lockfile uyumsuzlugunu hedefler
-- `renv::repair()` cache / symlink bozulmalarinda yardimci olabilir
-- bunlar attach zinciri problemini otomatik olarak cozmez
+- `renv::restore()` targets lockfile mismatches
+- `renv::repair()` can help with cache / symlink corruption
+- these commands do not automatically solve attach chain problems
 
-## Kacinilmasi Gerekenler
+## Things to Avoid
 
-- `~/.Rprofile` icine `rm(list = ls())` koymayin
-- VS Code disinda acilan plain shell oturumunu VS Code oturumu gibi zorlamayin
-- proje `.Rprofile` varsa `~/.Rprofile` nasil olsa otomatik calisir varsayimina guvenmeyin
-- `R --vanilla` ile acilan oturumlarda profile davranisinin degisecegini unutmayin
-- `RENV_CONFIG_EXTERNAL_LIBRARIES` ayarinin attach problemini tek basina cozecegini varsaymayin
-- her ortama kosulsuz `source("~/.Rprofile")` ekleyip yan etkileri yok saymayin
+- do not put `rm(list = ls())` in `~/.Rprofile`
+- do not force a plain shell session opened outside VS Code to behave like a VS Code session
+- if there is a project `.Rprofile`, do not assume that `~/.Rprofile` will automatically run anyway
+- remember that sessions opened with `R --vanilla` have different profile behavior
+- do not assume that `RENV_CONFIG_EXTERNAL_LIBRARIES` solves the attach problem by itself
+- do not add unconditional `source("~/.Rprofile")` everywhere while ignoring possible side effects
 
-## Onerilen Standart
+## Recommended Standard
 
-1. Home altinda tek bir referans `~/.Rprofile` tutun
-2. Bu dosyada `~/.vscode-R/init.R` source ve gerekiyorsa `.First.sys()` fallback mantigini bulundurun
-3. `renv` projelerinde proje `.Rprofile` icine once `source("renv/activate.R")`, sonra kosullu home profile source blogunu ekleyin
-4. R terminalini VS Code / Antigravity icinden acin
-5. `~/.Renviron` icinde gerekirse `RENV_CONFIG_EXTERNAL_LIBRARIES=/usr/local/lib/R/site-library` tanimlayin
-6. Lockfile uyumsuzluklari icin `renv::restore()` calistirin
+1. Keep a single reference `~/.Rprofile` under the home directory
+2. In that file, include the logic to source `~/.vscode-R/init.R` and, when needed, run the `.First.sys()` fallback
+3. In `renv` projects, add `source("renv/activate.R")` first in the project `.Rprofile`, then add the conditional home profile source block
+4. Open the R terminal from inside VS Code / Antigravity
+5. If needed, define `RENV_CONFIG_EXTERNAL_LIBRARIES=/usr/local/lib/R/site-library` inside `~/.Renviron`
+6. Run `renv::restore()` for lockfile mismatches
 
-## Pratik Sonuc
+## Practical Conclusion
 
-Bu senaryoda pratik olarak en saglam yaklasim sudur:
+In practice, the most robust approach in this scenario is:
 
-- home `~/.Rprofile` dosyasini VS Code bootstrap icin merkez yapin
-- `renv` proje `.Rprofile` dosyasina kosullu home profile source blogunu standart snippet olarak ekleyin
-- startup zinciri problemini package visibility probleminden ayri degerlendirin
+- make the home `~/.Rprofile` the central place for the VS Code bootstrap
+- add the conditional home profile source block as a standard snippet in the `renv` project `.Rprofile`
+- evaluate startup chain problems separately from package visibility problems
 
-## Kisa Ozet
+## Short Summary
 
-- normal klasorlerde `~/.Rprofile` genelde yeterlidir
-- `renv` projelerinde proje `.Rprofile`, home profile zincirini golgeleyebilir
-- `RENV_CONFIG_EXTERNAL_LIBRARIES` faydalidir ama attach problemini tek basina cozmez
-- remote Docker + SSH senaryosunda kritik nokta, home `~/.Rprofile` icindeki VS Code bootstrap ve `.First.sys()` fallback'inin calisabilmesidir
-- bu nedenle `renv` proje `.Rprofile` dosyasina kosullu `source("~/.Rprofile")` blogu eklemek en pratik standart cozumdur
+- in regular folders, `~/.Rprofile` is usually enough
+- in `renv` projects, the project `.Rprofile` can shadow the home profile chain
+- `RENV_CONFIG_EXTERNAL_LIBRARIES` is useful, but it does not solve the attach problem by itself
+- in the remote Docker + SSH scenario, the critical point is making sure the VS Code bootstrap and `.First.sys()` fallback inside the home `~/.Rprofile` can run
+- therefore, adding a conditional `source("~/.Rprofile")` block to the `renv` project `.Rprofile` is the most practical standard solution
