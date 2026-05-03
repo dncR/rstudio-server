@@ -166,11 +166,17 @@ Then configure VS Code to use `radian` as the R terminal. Add the following sett
 
 ```json
 {
-  "r.rterm.mac": "/usr/local/bin/radian"
+  "r.rterm.linux": "/home/rstudio/.local/bin/radian",
+  "r.bracketedPaste": true,
+  "r.rterm.option": [
+    "--no-save",
+    "--no-restore"
+  ],
+  "r.rpath.linux": "/usr/local/bin/R"
 }
 ```
 
-This setting should be placed in the Remote SSH settings because the path belongs to the remote container. Keeping it remote-specific avoids conflicts with a local `radian` installation or a different local executable path.
+These settings should be placed in the Remote SSH settings because the paths belong to the Linux container, not the local machine. `r.rterm.linux` points VS Code to the user-level `radian` executable, `r.rpath.linux` points the extension to the container's R binary, `r.rterm.option` starts R without saving or restoring workspace state, and `r.bracketedPaste` improves multi-line paste behavior in the R terminal.
 
 ## Quick Check
 
