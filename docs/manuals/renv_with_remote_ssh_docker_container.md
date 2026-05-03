@@ -124,6 +124,54 @@ For packages that should be shared across multiple `renv` projects, the recommen
 
 `languageserver` provides language features used by VS Code. `devtools` and `remotes` are useful for installing and managing development packages, including packages from remote repositories.
 
+### radian as the VS Code R Terminal
+
+`radian` can be used as the R terminal backend in VS Code. The simplest installation path is through `pipx`.
+
+Install `pipx` inside the remote container:
+
+```sh
+sudo apt-get update
+sudo apt-get install -y pipx
+```
+
+Install `radian` for the remote user that will run R, for example the `rstudio` user:
+
+```sh
+pipx install radian
+```
+
+This usually creates the executable under the user's local binary directory, for example:
+
+```text
+/home/rstudio/.local/bin/radian
+```
+
+If `radian` also needs to be available for root, it can be installed for root separately:
+
+```sh
+sudo pipx install radian
+```
+
+To make the user-level `radian` executable available system-wide, create a symbolic link under `/usr/local/bin`:
+
+```sh
+sudo ln -sf /home/rstudio/.local/bin/radian /usr/local/bin/radian
+sudo chmod +x /home/rstudio/.local/bin/radian
+```
+
+Adjust `/home/rstudio/.local/bin/radian` if `radian` was installed under a different remote user. The important point is that `/usr/local/bin/radian` should resolve to the executable inside the remote container.
+
+Then configure VS Code to use `radian` as the R terminal. Add the following setting to the Remote SSH User Settings JSON, not the local user settings JSON:
+
+```json
+{
+  "r.rterm.mac": "/usr/local/bin/radian"
+}
+```
+
+This setting should be placed in the Remote SSH settings because the path belongs to the remote container. Keeping it remote-specific avoids conflicts with a local `radian` installation or a different local executable path.
+
 ## Quick Check
 
 Start R from the VS Code terminal connected to the container, then run:
