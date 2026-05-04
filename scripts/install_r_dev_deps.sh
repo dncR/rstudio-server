@@ -42,11 +42,13 @@ if [ "$R_DEV_DEPS" = "true" ]; then
         libfribidi-dev \
         libgit2-dev \
         qpdf \
-        ghostscript-x
+        ghostscript-x \
+        libuv1-dev \
+        cmake
 
     rm -rf /var/lib/apt/lists/*
 
-    R -e "install.packages(c('devtools', 'BiocManager'), repos='https://cran.r-project.org')"
+    Rscript /rocker_scripts/install_r_dev_deps.R
     metadata_set_module "r_dev_deps" "true"
 else
     echo "Skipping R development and R CMD check dependencies (R_DEV_DEPS=$R_DEV_DEPS)"
