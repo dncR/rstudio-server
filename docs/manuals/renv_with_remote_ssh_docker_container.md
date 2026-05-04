@@ -116,7 +116,7 @@ Install the required R packages inside the remote container:
 
 ```r
 install.packages(
-  c("devtools", "remotes", "languageserver"),
+  c("devtools", "BiocManager", "remotes", "languageserver"),
   lib = "/usr/local/lib/R/site-library"
 )
 ```
@@ -125,7 +125,7 @@ These packages can also be installed while `renv` is active. In that case, they 
 
 For packages that should be shared across multiple `renv` projects, the recommended approach is to install them while `renv` is not active and write them directly to the R site-library by passing the target library path through `lib`. On Ubuntu-based R images, `/usr/local/lib/R/site-library` is a common site-library path. Adjust this path if your image or operating system uses a different R site-library location.
 
-`languageserver` provides language features used by VS Code. `devtools` and `remotes` are useful for installing and managing development packages, including packages from remote repositories.
+`languageserver` provides language features used by VS Code. `devtools`, `BiocManager`, and `remotes` are useful for installing and managing development packages, including Bioconductor packages and packages from remote repositories.
 
 ### radian as the VS Code R Terminal
 
