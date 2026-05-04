@@ -24,26 +24,29 @@ nano ~/.Rprofile
 Recommended `~/.Rprofile` content:
 
 ```r
-term_program <- tolower(Sys.getenv("TERM_PROGRAM", unset = ""))
-is_vscode <- identical(term_program, "vscode")
-is_positron <- nzchar(Sys.getenv("POSITRON")) || identical(term_program, "positron")
-is_rstudio <- nzchar(Sys.getenv("RSTUDIO"))
+local({
+  term_program <- tolower(Sys.getenv("TERM_PROGRAM", unset = ""))
+  is_vscode <- identical(term_program, "vscode")
+  is_positron <- nzchar(Sys.getenv("POSITRON")) || identical(term_program, "positron")
+  is_rstudio <- nzchar(Sys.getenv("RSTUDIO"))
 
-if (interactive() && is_vscode && !is_positron && !is_rstudio) {
-  vsc_init <- path.expand("~/.vscode-R/init.R")
+  if (interactive() && is_vscode && !is_positron && !is_rstudio) {
+    home_dir <- Sys.getenv(if (.Platform$OS.type == "windows") "USERPROFILE" else "HOME")
+    vsc_init <- file.path(home_dir, ".vscode-R", "init.R")
 
-  if (file.exists(vsc_init)) {
-    source(vsc_init, local = globalenv())
+    if (file.exists(vsc_init)) {
+      source(vsc_init, local = globalenv())
 
-    if (!exists(".vsc.attach", envir = globalenv(), inherits = FALSE) &&
-        exists(".First.sys", envir = globalenv(), mode = "function", inherits = FALSE)) {
-      try(.First.sys(), silent = TRUE)
+      if (!exists(".vsc.attach", inherits = TRUE) &&
+          exists(".First.sys", envir = globalenv(), mode = "function", inherits = FALSE)) {
+        try(.First.sys(), silent = TRUE)
+      }
     }
   }
-}
+})
 ```
 
-This file is responsible for loading VS Code's R initialization logic when R is started from a VS Code terminal. It only runs in interactive VS Code sessions, avoids RStudio and Positron sessions, sources `~/.vscode-R/init.R`, and runs `.First.sys()` as a fallback when the VS Code attach function is not created immediately.
+This file is responsible for loading VS Code's R initialization logic when R is started from a VS Code terminal. It only runs in interactive VS Code sessions, avoids RStudio and Positron sessions, sources `~/.vscode-R/init.R`, and runs `.First.sys()` as a fallback when the VS Code attach function is not created immediately. The fallback is important for R 4.6 and newer sessions where the VS Code R initialization can leave a replacement `.First.sys` in the global environment without running its final attach step before the prompt appears.
 
 ## renv Project `.Rprofile`
 
