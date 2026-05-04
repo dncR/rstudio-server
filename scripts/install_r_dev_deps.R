@@ -1,4 +1,4 @@
-packages <- c("devtools", "BiocManager", "remotes", "languageserver")
+packages <- c("devtools", "BiocManager", "remotes")
 
 r_site_libs <- path.expand(.Library.site)
 r_site_libs <- r_site_libs[nzchar(r_site_libs)]
