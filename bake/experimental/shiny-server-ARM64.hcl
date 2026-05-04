@@ -10,6 +10,14 @@ variable "UBUNTU_VERSION" {
   default = "jammy"
 }
 
+variable "APT_MIRROR_AMD64" {
+  default = "http://archive.ubuntu.com/ubuntu"
+}
+
+variable "APT_MIRROR_ARM64" {
+  default = "http://ports.ubuntu.com/ubuntu-ports"
+}
+
 variable "R_VERSION" {
   default = "latest"
 }
@@ -88,6 +96,8 @@ target "shiny-server" {
     "TZ" = "${TZ}"
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
+    "APT_MIRROR_AMD64" = "${APT_MIRROR_AMD64}"
+    "APT_MIRROR_ARM64" = "${APT_MIRROR_ARM64}"
     "DEBIAN_FRONTEND" = "${DEBIAN_FRONTEND}"
     "SHINY_SERVER_VERSION" = "${SHINY_SERVER_VERSION}"
   }

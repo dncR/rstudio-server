@@ -7,6 +7,9 @@ FROM ${UBUNTU_IMAGE_REPO:-ubuntu}:${UBUNTU_VERSION:-noble}
 ARG UBUNTU_VERSION
 ARG R_BASE_IMAGE_REPO
 ARG RSTUDIO_IMAGE_REPO
+ARG TARGETARCH
+ARG APT_MIRROR_AMD64
+ARG APT_MIRROR_ARM64
 ARG R_VERSION
 ARG R_HOME
 ARG TZ
@@ -27,6 +30,9 @@ ENV TZ=${TZ:-Etc/UTC}
 ENV CRAN=${CRAN:-https://p3m.dev/cran/__linux__/${UBUNTU_VERSION:-noble}/latest}
 ENV LANG=${LANG:-en_US.UTF-8}
 ENV DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-noninteractive}
+
+COPY scripts/configure_apt_mirror.sh /rocker_scripts/configure_apt_mirror.sh
+RUN sh /rocker_scripts/configure_apt_mirror.sh
 
 # Ubuntu packages not included in "install_R_source.sh" or "setup_R.sh"
 RUN apt-get update && apt-get install -y --no-install-recommends \

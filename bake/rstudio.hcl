@@ -6,6 +6,14 @@ variable "UBUNTU_VERSION" {
   default = "noble"
 }
 
+variable "APT_MIRROR_AMD64" {
+  default = "http://archive.ubuntu.com/ubuntu"
+}
+
+variable "APT_MIRROR_ARM64" {
+  default = "http://ports.ubuntu.com/ubuntu-ports"
+}
+
 variable "R_VERSION" {
   default = "latest"
 }
@@ -98,6 +106,8 @@ target "rstudio" {
     "DEFAULT_USER" = "${DEFAULT_USER}"
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
+    "APT_MIRROR_AMD64" = "${APT_MIRROR_AMD64}"
+    "APT_MIRROR_ARM64" = "${APT_MIRROR_ARM64}"
     "R_DEV_DEPS" = "${R_DEV_DEPS}"
     "INSTALL_TEX" = "${INSTALL_TEX}"
     "INSTALL_JAVA" = "${INSTALL_JAVA}"

@@ -9,6 +9,9 @@ ARG R_BASE_IMAGE_REPO=dncr/r-base
 ARG RSTUDIO_IMAGE_REPO=dncr/rstudio-server
 ARG RSTUDIO_VERSION
 ARG DEFAULT_USER=rstudio
+ARG TARGETARCH
+ARG APT_MIRROR_AMD64
+ARG APT_MIRROR_ARM64
 ARG R_DEV_DEPS
 ARG INSTALL_TEX
 ARG INSTALL_JAVA
@@ -24,6 +27,9 @@ ENV PANDOC_VERSION=default
 ENV QUARTO_VERSION=default
 
 ENV LANG=${LANG:-en_US.UTF-8}
+
+COPY scripts/configure_apt_mirror.sh /rocker_scripts/configure_apt_mirror.sh
+RUN sh /rocker_scripts/configure_apt_mirror.sh
 
 COPY scripts /rocker_scripts
 RUN find /rocker_scripts -type d -exec chmod 755 {} + && \

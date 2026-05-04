@@ -9,6 +9,9 @@ ARG R_VERSION
 ARG R_HOME
 ARG TZ
 ARG LANG
+ARG TARGETARCH
+ARG APT_MIRROR_AMD64
+ARG APT_MIRROR_ARM64
 ARG DEBIAN_FRONTEND
 ARG SHINY_SERVER_VERSION
 
@@ -23,6 +26,9 @@ ENV DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-noninteractive}
 ENV S6_VERSION="v2.1.0.2"
 ENV PANDOC_VERSION="default"
 ENV SHINY_SERVER_VERSION=${SHINY_SERVER_VERSION:-latest}
+
+COPY scripts/configure_apt_mirror.sh /rocker_scripts/configure_apt_mirror.sh
+RUN sh /rocker_scripts/configure_apt_mirror.sh
 
 COPY scripts /rocker_scripts
 

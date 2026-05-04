@@ -120,6 +120,22 @@ Build a CLI-first `r-base` development image with optional modules:
 R_VERSION=4.4.3 UBUNTU_VERSION=noble R_BASE_MODE=dev INSTALL_TEX=base docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
 ```
 
+Override the Ubuntu apt mirror used during image builds when the default mirror
+is slow from your build network:
+
+```sh
+APT_MIRROR_AMD64=http://tr.archive.ubuntu.com/ubuntu \
+APT_MIRROR_ARM64=http://ports.ubuntu.com/ubuntu-ports \
+R_VERSION=4.4.3 UBUNTU_VERSION=noble \
+docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
+```
+
+`TARGETARCH` is provided automatically by Docker BuildKit for each platform, so
+do not pass it manually. `APT_MIRROR_AMD64` is used for `linux/amd64`, and
+`APT_MIRROR_ARM64` is used for `linux/arm64`. See
+[`bake/README.md`](bake/README.md#apt-mirror-selection) for the default mirror
+values, Turkey and Europe mirror suggestions, and HTTP/HTTPS notes.
+
 Use `bake/image-builds.hcl` as the canonical build workflow. Its default group
 builds `r-base` and `rstudio` together, and the RStudio target is wired to the
 local `r-base` target, so the build does not depend on an already-published

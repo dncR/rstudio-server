@@ -39,6 +39,8 @@ separate files when you want to build and push `r-base` first, then build
 | `R_BASE_IMAGE_REPO` | `dncr/r-base` | `r-base`, `rstudio` | Docker image repository, for example `myuser/r-base` | Repository used for the `r-base` image tag, registry cache reference, standalone RStudio base image, and metadata. |
 | `RSTUDIO_IMAGE_REPO` | `dncr/rstudio-server` | `rstudio` | Docker image repository, for example `myuser/rstudio-server` | Repository used for the RStudio image tag, registry cache reference, Compose image, and metadata. |
 | `UBUNTU_VERSION` | `noble` | `r-base`, `rstudio` | Ubuntu codenames supported by the Dockerfiles, for example `noble` | Ubuntu version used in image tags, base image selection, CRAN binary URL construction, and metadata. |
+| `APT_MIRROR_AMD64` | `http://archive.ubuntu.com/ubuntu` | `r-base`, `rstudio` | Ubuntu archive mirror root URL | Apt mirror used when BuildKit sets `TARGETARCH=amd64`. |
+| `APT_MIRROR_ARM64` | `http://ports.ubuntu.com/ubuntu-ports` | `r-base`, `rstudio` | Ubuntu ports archive mirror root URL | Apt mirror used when BuildKit sets `TARGETARCH=arm64`. |
 | `R_VERSION` | `latest` | `r-base`, `rstudio` | `latest`, `devel`, `patched`, or an R version such as `4.6.0` | R version used by the R build scripts and image tags. |
 | `R_HOME` | `/usr/local/lib/R` | `r-base` | Absolute in-container path | Installation path for source-built R. |
 | `TZ` | `Etc/UTC` | `r-base` | Time zone database names | Time zone configured during the R base image build. |
@@ -98,6 +100,49 @@ Shell environment variables are read by `docker buildx bake` before defaults in
 this file. If `DEFAULT_USER`, `INSTALL_TEX`, or another build argument is
 exported in your shell, that value overrides the HCL default. Check the active
 environment before debugging unexpected build output.
+
+## Apt Mirror Selection
+
+Docker BuildKit provides `TARGETARCH` automatically for each platform in
+`platforms = ["linux/amd64", "linux/arm64"]`. The Dockerfiles pass
+`APT_MIRROR_AMD64`, `APT_MIRROR_ARM64`, and `TARGETARCH` to
+`scripts/configure_apt_mirror.sh`, which rewrites Ubuntu apt source URLs before
+the first `apt-get update`.
+
+Use mirror root URLs without a trailing slash:
+
+```sh
+APT_MIRROR_AMD64=http://tr.archive.ubuntu.com/ubuntu \
+APT_MIRROR_ARM64=http://ports.ubuntu.com/ubuntu-ports \
+docker buildx bake --file bake/image-builds.hcl --builder multiarch --push r-base
+```
+
+Default apt mirrors:
+
+| Architecture | Default mirror |
+| --- | --- |
+| `amd64` | `http://archive.ubuntu.com/ubuntu` |
+| `arm64` | `http://ports.ubuntu.com/ubuntu-ports` |
+
+Suggested AMD64 archive mirrors:
+
+For the complete Ubuntu archive mirror list, see
+<https://launchpad.net/ubuntu/+archivemirrors>.
+
+| Country | Mirror URL | Reported bandwidth |
+| --- | --- | --- |
+| Turkey | `http://tr.archive.ubuntu.com/ubuntu` | Country mirror |
+| Germany, University of Stuttgart | `http://ftp.uni-stuttgart.de/ubuntu` | 100 Gbps |
+| Germany | `http://ftp.halifax.rwth-aachen.de/ubuntu` | 20 Gbps |
+| Austria | `https://mirror.alwyzon.net/ubuntu` | 20 Gbps |
+| France | `https://ubuntu.lafibre.info/ubuntu` | 10 Gbps |
+| Netherlands | `https://nl.mirrors.clouvider.net/ubuntu` | 10 Gbps |
+
+`http` and `https` are both acceptable when the mirror supports them. Ubuntu apt
+metadata and packages are still verified by apt signatures; `https` adds
+transport-layer protection and can be preferred on managed networks. Check the
+official mirror registry for current mirror status before relying on a specific
+mirror in CI.
 
 ## Target Behavior
 

@@ -18,6 +18,14 @@ variable "UBUNTU_VERSION" {
   default = "noble"
 }
 
+variable "APT_MIRROR_AMD64" {
+  default = "http://archive.ubuntu.com/ubuntu"
+}
+
+variable "APT_MIRROR_ARM64" {
+  default = "http://ports.ubuntu.com/ubuntu-ports"
+}
+
 variable "R_VERSION" {
   default = "latest"
 }
@@ -106,6 +114,8 @@ target "r-base" {
     "LANG" = "${R_LANG}"
     "UBUNTU_VERSION" = "${UBUNTU_VERSION}"
     "UBUNTU_IMAGE_REPO" = "${UBUNTU_IMAGE_REPO}"
+    "APT_MIRROR_AMD64" = "${APT_MIRROR_AMD64}"
+    "APT_MIRROR_ARM64" = "${APT_MIRROR_ARM64}"
     "R_BASE_IMAGE_REPO" = "${R_BASE_IMAGE_REPO}"
     "RSTUDIO_IMAGE_REPO" = "${RSTUDIO_IMAGE_REPO}"
     "DEBIAN_FRONTEND" = "${DEBIAN_FRONTEND}"
