@@ -166,6 +166,12 @@ Published images are stored on Docker Hub in the `dncr/r-base` and
 `dncr/rstudio-server` repositories. For each major R release, the latest minor
 release image is kept available, for example `4.4.3` or `4.5.3`. Older minor
 release images are removed regularly as newer minor releases become available.
+The Docker Hub images are built with SSH, TeX Live `extra`, R development
+tools/packages, and Java preinstalled by default:
+
+```sh
+R_VERSION=4.5.3 UBUNTU_VERSION=noble INSTALL_JAVA=1 INSTALL_SSH=1 INSTALL_TEX=extra R_DEV_DEPS=1 docker buildx bake --file bake/image-builds.hcl --builder multiarch --push
+```
 
 Two build-time details are worth checking before running Compose with a custom
 image. First, boolean optional build args accept case-insensitive `true`/`false`
