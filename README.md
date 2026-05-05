@@ -107,6 +107,10 @@ the final image tag to the registry. `--load` exports a single-platform image to
 the local Docker image store. `CACHE_REMOTE=true` enables registry cache
 import/export through the `cache-*` tags; it does not push the final image by
 itself. `CACHE_REMOTE=false` is the default and disables remote registry cache.
+BuildKit cache data is not stored in Docker Hub for the published images in this
+repository. The `rstudio-server` build output is large enough that pushing
+registry cache to Docker Hub can fail with blob upload errors such as
+`400 Bad Request`, so only the final image is published and retained there.
 
 Build an RStudio image with optional development features:
 
@@ -157,6 +161,11 @@ See [`bake/README.md`](bake/README.md) for the complete build argument, cache,
 target behavior, and metadata reference. Keep Docker Hub repository names in
 `owner/name` form for `R_BASE_IMAGE_REPO` and `RSTUDIO_IMAGE_REPO`; do not
 include a leading `docker.io/` prefix.
+
+Published images are stored on Docker Hub in the `dncr/r-base` and
+`dncr/rstudio-server` repositories. For each major R release, the latest minor
+release image is kept available, for example `4.4.3` or `4.5.3`. Older minor
+release images are removed regularly as newer minor releases become available.
 
 Two build-time details are worth checking before running Compose with a custom
 image. First, boolean optional build args accept case-insensitive `true`/`false`
